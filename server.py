@@ -115,6 +115,9 @@ def delete_inventory(inventory_id):
     if not inventory_row:
         return jsonify(data="item does not exist", status=400)
 
+    if inventory_row.deleted:
+        return jsonify(data="item is already deleted", status=400)
+
     inventory_row.comments = request.get_json().get("comments")
     inventory_row.deleted = True
     inventory_row.updated = datetime.now()
@@ -133,6 +136,9 @@ def restore_inventory(inventory_id):
 
     if not inventory_row:
         return jsonify(data="item does not exist", status=400)
+
+    if not inventory_row.deleted:
+        return jsonify(data="item is already active", status=400)
 
     inventory_row.deleted = False
     inventory_row.updated = datetime.now()

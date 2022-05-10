@@ -1,10 +1,9 @@
-"""Tests for Shopify Inventory app."""
+"""Tests for Inventory app."""
 
 from unittest import TestCase
 import os
-from flask import session
 from server import app
-from model import (connect_to_db, db, example_data)
+from model import connect_to_db, db, example_data
 
 
 class FlaskTestsBasic(TestCase):
@@ -20,7 +19,7 @@ class FlaskTestsBasic(TestCase):
         """Test homepage page."""
 
         result = self.client.get("/")
-        self.assertIn(b"", result.data)
+        self.assertIn(b"Shopify Backend", result.data)
 
 
 class FlaskTestsDatabase(TestCase):
@@ -48,57 +47,163 @@ class FlaskTestsDatabase(TestCase):
     def test_create_inventory(self):
         """Test create inventory route."""
 
+        # test successful create
         result = self.client.post("/api/create_inventory",
-                                  json={})
-        self.assertIn(b'', result.data)
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "12345",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'"status":200', result.data)
+        self.assertIn(b'"product_name":"TEST"', result.data)
+        self.assertIn(b'"deleted":false', result.data)
+
+        # test invalid input: not str(warehouse_id).isnumeric()
+        result2 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "A",\
+                                        "productName": "TEST",\
+                                        "sku": "12345",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result2.data)
+
+        # test invalid input: not str(sku).isalnum()
+        result3 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "1!324",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result3.data)
+
+        # test invalid input: not str(quantity).isnumeric()
+        result4 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "12324",\
+                                        "quantity": "A",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result4.data)
+
+        # test invalid input: warehouseId == ""
+        result5 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "",\
+                                        "productName": "TEST",\
+                                        "sku": "12345",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result5.data)
+
+        # test invalid input: productName == ""
+        result6 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "",\
+                                        "sku": "12345",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result6.data)
+
+        # test invalid input: sku == ""
+        result7 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "",\
+                                        "quantity": "10",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result7.data)
+
+        # test invalid input: quantity == ""
+        result8 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "12345",\
+                                        "quantity": "",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result8.data)
+
+        # test invalid input: int(quantity) < 0
+        result9 = self.client.post("/api/create_inventory",
+                                  json={"warehouseId": "1",\
+                                        "productName": "TEST",\
+                                        "sku": "12345",\
+                                        "quantity": "-1",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"invalid input","status":400}', result9.data)
 
     def test_read_inventory(self):
         """Test read inventory route."""
 
         result = self.client.get("/api/inventory")
-        self.assertIn(b'', result.data)
+        print(result.data)
+        self.assertIn(b'"deleted":false', result.data)
+        self.assertNotIn(b'"deleted":true', result.data)
+
+    def test_read_deleted_inventory(self):
+        """Test read deleted inventory route."""
+
+        result = self.client.get("/api/deleted_inventory")
+        self.assertIn(b'"deleted":true', result.data)
+        self.assertNotIn(b'"deleted":false', result.data)
 
     def test_update_inventory(self):
         """Test update inventory route."""
 
+        # test successful update
         result = self.client.post("/api/update_inventory/id:1",
-                                  json={})
-        self.assertIn(b'{}', result.data)
+                                  json={"warehouseId": "2",\
+                                        "productName": "Orange Chocolate",\
+                                        "sku": "0000005",\
+                                        "quantity": "100",\
+                                        "description": ""})
+        self.assertIn(b'"status":200', result.data)
+        self.assertIn(b'"product_name":"Orange Chocolate"', result.data)
+        self.assertNotIn(b'"product_name":"Milk Chocolate"', result.data)
+
+        # test update non-existing item
+        result2 = self.client.post("/api/update_inventory/id:100",
+                                  json={"warehouseId": "2",\
+                                        "productName": "Orange Chocolate",\
+                                        "sku": "0000005",\
+                                        "quantity": "0",\
+                                        "description": ""})
+        self.assertIn(b'{"data":"item does not exist","status":400}', result2.data)
 
     def test_delete_inventory(self):
         """Test delete inventory route."""
 
+        # test successful delete
         result = self.client.post("/api/delete_inventory/id:1",
-                                  json={})
-        self.assertIn(b'{}', result.data)
+                                  json={"comments": ""})
+        self.assertIn(b'"inventory_id":1', result.data)
+        self.assertNotIn(b'"inventory_id":2', result.data)
+        self.assertIn(b'"deleted":true', result.data)
+        self.assertNotIn(b'"deleted":false', result.data)
 
-    def test_create_shipment(self):
-        """Test create shipment route."""
+        # test delete already deleted item
+        result2 = self.client.post("/api/delete_inventory/id:1")
+        self.assertIn(b'{"data":"item is already deleted","status":400}', result2.data)
 
-        result = self.client.post("/api/create_shipment",
-                                  json={})
-        self.assertIn(b'', result.data)
+        # test delete non-existing item
+        result3 = self.client.post("/api/restore_inventory/id:100")
+        self.assertIn(b'{"data":"item does not exist","status":400}', result3.data)
 
-    def test_read_shipment(self):
-        """Test read shipment route."""
+    def test_restore_inventory(self):
+        """Test restore inventory route."""
 
-        result = self.client.get("/api/shipment")
-        self.assertIn(b'', result.data)
+        # test successful restore
+        result = self.client.post("/api/restore_inventory/id:5")
+        self.assertIn(b'"inventory_id":5', result.data)
+        self.assertNotIn(b'"inventory_id":1', result.data)
+        self.assertIn(b'"deleted":false', result.data)
+        self.assertNotIn(b'"deleted":true', result.data)
 
-    def test_update_shipment(self):
-        """Test update shipment route."""
+        # test restore not deleted item
+        result2 = self.client.post("/api/restore_inventory/id:1")
+        self.assertIn(b'{"data":"item is already active","status":400}', result2.data)
 
-        result = self.client.post("/api/update_shipment/id:1",
-                                  json={})
-        self.assertIn(b'{}', result.data)
-
-    def test_delete_shipment(self):
-        """Test delete shipment route."""
-
-        result = self.client.post("/api/delete_shipment/id:1",
-                                  json={})
-        self.assertIn(b'{}', result.data)
-
+        # test restore non-existing item
+        result3 = self.client.post("/api/restore_inventory/id:100")
+        self.assertIn(b'{"data":"item does not exist","status":400}', result3.data)
 
 
 if __name__ == "__main__":
