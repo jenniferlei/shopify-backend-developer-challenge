@@ -15,9 +15,19 @@ app.secret_key = "dev"
 app.jinja_env.undefined = StrictUndefined
 
 
-def validate_fields(warehouse_id, product_name, sku, quantity):
+def validate_fields(warehouse_id=1, product_name="test", sku="1", quantity=1):
     """Form fields error handling"""
-    # make sure warehouse id != ""
+    if not str(warehouse_id).isnumeric() or \
+       not str(sku).isalnum() or \
+       not str(quantity).isnumeric() or \
+       warehouse_id == "" or \
+       product_name == "" or \
+       sku == "" or \
+       quantity == "" or \
+       int(quantity) < 0:
+        return False
+    return True
+
 
 @app.route("/")
 def homepage():
@@ -26,12 +36,9 @@ def homepage():
     return render_template("index.html")
 
 
-# create inventory
 @app.route("/api/create_inventory", methods=["POST"])
 def create_inventory():
     """Create an inventory row and return a JSON response of inventories"""
-
-    # ADD ERROR HANDLING
 
     warehouse_id = request.get_json().get("warehouseId")
     product_name = request.get_json().get("productName")
@@ -39,16 +46,18 @@ def create_inventory():
     quantity = request.get_json().get("quantity")
     description = request.get_json().get("description")
 
-    inventory = Inventory.create_inventory(int(warehouse_id), product_name, sku, int(quantity), description)
-    db.session.add(inventory)
+    if not validate_fields(warehouse_id, product_name, sku, quantity):
+        return jsonify(data="invalid input", status=400)
+
+    inventory_row = Inventory.create_inventory(int(warehouse_id), product_name, sku, int(quantity), description)
+    db.session.add(inventory_row)
     db.session.commit()
     
-    inventory_json = inventory.to_dict()
+    inventory_json = inventory_row.to_dict()
 
-    return jsonify({"inventory": inventory_json})
+    return jsonify(data=inventory_json, status=200)
 
 
-# read inventory
 @app.route("/api/inventory", methods=["GET"])
 def view_inventory():
     """Return a JSON response of inventory rows"""
@@ -56,10 +65,9 @@ def view_inventory():
     inventory_rows = Inventory.retrieve_inventory()
     inventory_json = [i.to_dict() for i in inventory_rows]
     
-    return jsonify({"inventory": inventory_json})
+    return jsonify(data=inventory_json)
 
 
-# read inventory
 @app.route("/api/deleted_inventory", methods=["GET"])
 def view_deleted_inventory():
     """Return a JSON response of deleted inventory rows"""
@@ -67,7 +75,7 @@ def view_deleted_inventory():
     inventory_rows = Inventory.retrieve_deleted_inventory()
     inventory_json = [i.to_dict() for i in inventory_rows]
     
-    return jsonify({"inventory": inventory_json})
+    return jsonify(data=inventory_json)
 
 
 # update inventory
@@ -77,10 +85,29 @@ def update_inventory(inventory_id):
 
     warehouse_id = request.get_json().get("warehouseId")
     product_name = request.get_json().get("productName")
+    sku = request.get_json().get("sku")
     quantity = request.get_json().get("quantity")
     description = request.get_json().get("description")
+
+    if not validate_fields(warehouse_id, product_name, sku, quantity):
+        return jsonify(data="invalid input", status=400)
+
+    inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
+
+    if not inventory_row:
+        return jsonify(data="row does not exist", status=400)
+
+    inventory_row.warehouse_id = int(warehouse_id)
+    inventory_row.product_name = product_name
+    inventory_row.sku = sku
+    inventory_row.quantity = int(quantity)
+    inventory_row.description = description
+    inventory_row.updated = datetime.now()
+    db.session.commit()
     
-    return jsonify({"inventory": inventory_json})
+    inventory_json = inventory_row.to_dict()
+
+    return jsonify(data=inventory_json, status=200)
 
 
 # delete inventory
@@ -88,20 +115,31 @@ def update_inventory(inventory_id):
 def delete_inventory(inventory_id):
     """Delete an inventory row"""
 
-    # add comment
-    # change deleted to true
+    inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
+    inventory_row.comments = request.get_json().get("comments")
+    inventory_row.deleted = True
+    inventory_row.updated = datetime.now()
     
-    return "Success"
+    db.session.commit()
+    
+    inventory_json = inventory_row.to_dict()
+
+    return jsonify(data=inventory_json, status=200)
 
 # restore inventory
 @app.route("/api/restore_inventory/id:<inventory_id>", methods=["POST"])
 def restore_inventory(inventory_id):
     """Restore a deleted inventory row"""
 
-    # add comment
-    # change deleted to true
+    inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
+    inventory_row.deleted = False
+    inventory_row.updated = datetime.now()
+
+    db.session.commit()
     
-    return "Success"
+    inventory_json = inventory_row.to_dict()
+    
+    return jsonify(data=inventory_json, status=200)
 
 
 if __name__ == "__main__":

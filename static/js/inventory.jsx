@@ -3,6 +3,7 @@
 const UpdateInventoryModal = (props) => {
   const [warehouseId, setWarehouseId] = React.useState(props.warehouseId);
   const [productName, setProductName] = React.useState(props.productName);
+  const [sku, setSku] = React.useState(props.sku);
   const [quantity, setQuantity] = React.useState(props.quantity);
   const [description, setDescription] = React.useState(props.description);
 
@@ -16,15 +17,14 @@ const UpdateInventoryModal = (props) => {
       body: JSON.stringify({
         warehouseId,
         productName,
+        sku,
         quantity,
         description,
       }),
     })
-      .then((response) => {
-        response.json();
-      })
+      .then((response) => response.json())
       .then((jsonResponse) => {
-        // console.log(jsonResponse);
+        console.log(jsonResponse);
         props.getInventory();
       });
   };
@@ -56,7 +56,7 @@ const UpdateInventoryModal = (props) => {
             </div>
             <div className="modal-body">
               <div className="mb-3">
-                <label htmlFor="petIdInput">Warehouse ID</label>
+                <label htmlFor="warehouseId">Warehouse ID *</label>
                 <select
                   className="form-select"
                   aria-label="Select Warehouse ID"
@@ -73,7 +73,17 @@ const UpdateInventoryModal = (props) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="productName">Product Name</label>
+                <label htmlFor="sku">SKU *</label>
+                <input
+                  type="text"
+                  value={sku}
+                  onChange={(event) => setSku(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="productName">Product Name *</label>
                 <input
                   type="text"
                   value={productName}
@@ -94,7 +104,7 @@ const UpdateInventoryModal = (props) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="totalTimeInput">Quantity</label>
+                <label htmlFor="totalTimeInput">Quantity *</label>
                 <input
                   type="number"
                   step="1"
@@ -131,7 +141,7 @@ const UpdateInventoryModal = (props) => {
 };
 
 const DeleteInventoryModal = (props) => {
-  const [comment, setComment] = React.useState("");
+  const [comments, setComments] = React.useState("");
 
   const deleteExistingInventory = () => {
     fetch(`/api/delete_inventory/id:${props.inventoryId}`, {
@@ -141,13 +151,13 @@ const DeleteInventoryModal = (props) => {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        comment,
+        comments,
       }),
     })
       .then((response) => response.json())
       .then((jsonResponse) => {
-        // console.log(jsonResponse);
-        props.getDeletedInventory();
+        console.log(jsonResponse);
+        props.getInventory();
       });
   };
 
@@ -183,8 +193,7 @@ const DeleteInventoryModal = (props) => {
                   className="form-control"
                   name="body"
                   rows="2"
-                  value={comment}
-                  onChange={(event) => setComment(event.target.value)}
+                  onChange={(event) => setComments(event.target.value)}
                 ></textarea>
               </div>
               <div className="modal-footer">
@@ -213,16 +222,16 @@ const DeleteInventoryModal = (props) => {
 };
 
 const InventoryTableRow = (props) => {
-  // Process deletion
-  const deleteInventory = () => {
-    fetch(`/api/delete_inventory/id:${props.inventoryId}`, {
+  // Process restore
+  const restoreInventory = () => {
+    fetch(`/api/restore_inventory/id:${props.inventoryId}`, {
       method: "POST",
-    }).then((response) => {
-      response.json().then((jsonResponse) => {
-        // console.log(jsonResponse);
-        props.getInventory();
+    })
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        props.getDeletedInventory();
       });
-    });
   };
   return (
     <tr>
@@ -238,12 +247,12 @@ const InventoryTableRow = (props) => {
       </td>
       <td>
         <span>
-          <small>{props.productName}</small>
+          <small>{props.sku}</small>
         </span>
       </td>
       <td>
         <span>
-          <small>{props.sku}</small>
+          <small>{props.productName}</small>
         </span>
       </td>
       <td>
@@ -306,10 +315,9 @@ const InventoryTableRow = (props) => {
           </td>
           <td>
             <span>
-              <a
-                href=""
+              <button
                 className="btn btn-sm btn-outline-dark delete-btn"
-                // onClick={}
+                onClick={restoreInventory}
               >
                 <small>
                   <i
@@ -319,7 +327,7 @@ const InventoryTableRow = (props) => {
                     className="bi bi-plus"
                   ></i>
                 </small>
-              </a>
+              </button>
             </span>
           </td>
         </React.Fragment>
@@ -344,9 +352,9 @@ const InventoryContainer = () => {
   const getInventory = () => {
     fetch("/api/inventory")
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventories(data.inventory);
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        setInventories(jsonResponse.data);
         setView("all");
       });
   };
@@ -354,9 +362,9 @@ const InventoryContainer = () => {
   const getDeletedInventory = () => {
     fetch("/api/deleted_inventory")
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventories(data.inventory);
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        setInventories(jsonResponse.data);
         setView("deleted");
       });
   };
@@ -399,7 +407,7 @@ const InventoryContainer = () => {
         quantity={inventoryRow.quantity}
         comments={inventoryRow.comments}
         deleted={inventoryRow.deleted}
-        getInventory={getInventory}
+        getDeletedInventory={getDeletedInventory}
       />
     );
 
@@ -425,7 +433,7 @@ const InventoryContainer = () => {
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
-        getDeletedInventory={getDeletedInventory}
+        getInventory={getInventory}
       />
     );
   }
@@ -475,7 +483,7 @@ const InventoryContainer = () => {
             </div>
             <div className="card-body">
               <div className="mb-3">
-                <label htmlFor="petIdInput">Warehouse ID *</label>
+                <label htmlFor="warehouseId">Warehouse ID *</label>
                 <select
                   className="form-select"
                   aria-label="Select Warehouse ID"
@@ -489,21 +497,21 @@ const InventoryContainer = () => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="productName">Product Name *</label>
-                <input
-                  type="text"
-                  value={productName}
-                  onChange={(event) => setProductName(event.target.value)}
-                  className="form-control input-lg"
-                />
-              </div>
-
-              <div className="mb-3">
                 <label htmlFor="sku">SKU *</label>
                 <input
                   type="text"
                   value={sku}
                   onChange={(event) => setSku(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="productName">Product Name *</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(event) => setProductName(event.target.value)}
                   className="form-control input-lg"
                 />
               </div>
@@ -548,8 +556,8 @@ const InventoryContainer = () => {
                 <tr>
                   <th role="columnheader">ID</th>
                   <th role="columnheader">Warehouse</th>
-                  <th role="columnheader">Product Name</th>
                   <th role="columnheader">SKU</th>
+                  <th role="columnheader">Product Name</th>
                   <th role="columnheader">Description</th>
                   <th role="columnheader">Quantity</th>
                   {view === "all" ? (
