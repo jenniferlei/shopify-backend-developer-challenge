@@ -1,121 +1,128 @@
 "use strict";
 
-// Inventory
-const Inventory = () => {
-  const session_login = document.querySelector("#login").innerText;
+const UpdateInventoryModal = (props) => {
+  const [warehouseId, setWarehouseId] = React.useState(props.warehouseId);
+  const [productName, setProductName] = React.useState(props.productName);
+  const [quantity, setQuantity] = React.useState(props.quantity);
+  const [description, setDescription] = React.useState(props.description);
 
-  const [checkIns, setCheckIns] = React.useState([]);
-
-  if (session_login === "True") {
-    React.useEffect(() => {
-      getCheckIns();
-    }, []);
-  }
-
-  const getCheckIns = () => {
-    fetch(`/user_check_ins.json`)
-      .then((response) => response.json())
-      .then((data) => {
-        setCheckIns(data.checkIns);
+  const updateExistingInventory = () => {
+    fetch(`/api/update_inventory/id:${props.inventoryId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        warehouseId,
+        productName,
+        quantity,
+        description,
+      }),
+    })
+      .then((response) => {
+        response.json();
+      })
+      .then((jsonResponse) => {
+        // console.log(jsonResponse);
+        props.getInventory();
       });
   };
 
-  const allCheckIns = [];
-  const allEditCheckIns = [];
-
-  for (const currentCheckIn of checkIns) {
-    const date_hiked = new Date(currentCheckIn.date_hiked);
-    const date_hiked_formatted = date_hiked.toLocaleDateString();
-
-    allCheckIns.push(
-      <CheckIn
-        key={currentCheckIn.check_in_id}
-        hike_id={currentCheckIn.hike_id}
-        hike_name={currentCheckIn.hike["hike_name"]}
-        check_in_id={currentCheckIn.check_in_id}
-        date_hiked={date_hiked_formatted}
-        miles_completed={currentCheckIn.miles_completed}
-        total_time={currentCheckIn.total_time}
-        notes={currentCheckIn.notes}
-        pets_on_hike={currentCheckIn.pets}
-        pets_not_on_hike={currentCheckIn.pets_not_on_hike}
-        getCheckIns={getCheckIns}
-      />
-    );
-    allEditCheckIns.push(
-      <EditCheckIn
-        key={currentCheckIn.check_in_id}
-        hike_id={currentCheckIn.hike_id}
-        check_in_id={currentCheckIn.check_in_id}
-        date_hiked={date_hiked_formatted}
-        miles_completed={currentCheckIn.miles_completed}
-        total_time={currentCheckIn.total_time}
-        notes={currentCheckIn.notes}
-        pets_on_hike={currentCheckIn.pets}
-        pets_not_on_hike={currentCheckIn.pets_not_on_hike}
-        getCheckIns={getCheckIns}
-      />
-    );
-  }
-
   return (
     <React.Fragment>
-      <AddCheckIn getCheckIns={getCheckIns} />
-      {allEditCheckIns}
       <div
-        className="offcanvas offcanvas-end"
-        style={{ width: "650px" }}
-        data-bs-keyboard="true"
-        data-bs-scroll="true"
-        data-bs-backdrop="true"
+        className="modal fade"
+        id={`modal-update-inventory-${props.inventoryId}`}
         tabIndex="-1"
-        id="CheckIns"
-        aria-labelledby="CheckInsLabel"
+        aria-labelledby={`modal-update-inventory-${props.inventoryId}-label`}
+        aria-hidden="true"
       >
-        <div className="offcanvas-header">
-          <h3 className="offcanvas-title" id="CheckInsLabel">
-            All Check Ins
-          </h3>
-          {session_login === "True" ? (
-            <a
-              className="btn btn-sm btn-outline-dark fw-300"
-              href=""
-              data-bs-toggle="modal"
-              data-bs-target="#modal-add-check-in"
-            >
-              <i
-                data-bs-toggle="tooltip"
-                data-bs-placement="right"
-                title="add a check in"
-                className="bi bi-check-circle"
-              ></i>{" "}
-              add a check in
-            </a>
-          ) : null}
-        </div>
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5
+                className="modal-title"
+                id={`modal-update-inventory-${props.inventoryId}-label`}
+              >
+                Update Inventory Row
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label htmlFor="petIdInput">Warehouse ID</label>
+                <select
+                  className="form-select"
+                  aria-label="Select Warehouse ID"
+                  id="warehouse-id"
+                  onChange={(event) => setWarehouseId(event.target.value)}
+                >
+                  <option value={props.warehouseId} selected>
+                    {props.warehouseId}
+                  </option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((wh) => (
+                    <option value={wh}>{wh}</option>
+                  ))}
+                </select>
+              </div>
 
-        <div className="offcanvas-body">
-          {session_login !== "True" ? (
-            <div className="fw-300">Please log in to add a check in.</div>
-          ) : (
-            <div>{allCheckIns}</div>
-          )}
+              <div className="mb-3">
+                <label htmlFor="productName">Product Name</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(event) => setProductName(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
 
-          <div
-            className="offcanvas-footer"
-            style={{
-              position: "fixed",
-              right: "613px",
-              bottom: "10px",
-              zIndex: "100",
-            }}
-          >
-            <button
-              type="button"
-              className="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
+              <div className="mb-3">
+                <label htmlFor="description">Description</label>
+                <textarea
+                  className="form-control"
+                  name="body"
+                  rows="2"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                ></textarea>
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="totalTimeInput">Quantity</label>
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={quantity}
+                  onChange={(event) => setQuantity(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  className="btn btn-sm btn-outline-dark btn-block"
+                  type="submit"
+                  data-bs-dismiss="modal"
+                  onClick={updateExistingInventory}
+                >
+                  Update
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary btn-block"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -123,473 +130,449 @@ const Inventory = () => {
   );
 };
 
-const AllHikesCommentContainer = () => {
-  const session_login = document.querySelector("#login").innerText;
-  const [comments, setComments] = React.useState([]);
+const DeleteInventoryModal = (props) => {
+  const [comment, setComment] = React.useState("");
 
-  if (session_login === "True") {
-    React.useEffect(() => {
-      getComments();
-    }, []);
-  }
-
-  const getComments = () => {
-    fetch(`/user_comments.json`)
+  const deleteExistingInventory = () => {
+    fetch(`/api/delete_inventory/id:${props.inventoryId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        comment,
+      }),
+    })
       .then((response) => response.json())
-      .then((data) => {
-        setComments(data.comments);
+      .then((jsonResponse) => {
+        // console.log(jsonResponse);
+        props.getDeletedInventory();
       });
   };
 
-  const allComments = [];
-  const allEditComments = [];
-
-  for (const currentComment of comments) {
-    const date_edited = new Date(currentComment.date_edited);
-    const date_edited_formatted = `${date_edited.toLocaleDateString()} ${date_edited.toLocaleTimeString()}`;
-    const date_created = new Date(currentComment.date_created);
-    const date_created_formatted = `${date_created.toLocaleDateString()} ${date_created.toLocaleTimeString()}`;
-
-    allComments.push(
-      <Comment
-        key={currentComment.comment_id}
-        hike_id={currentComment.hike_id}
-        hike_name={currentComment.hike.hike_name}
-        comment_id={currentComment.comment_id}
-        full_name={currentComment.user.full_name}
-        user_id={currentComment.user_id}
-        date_created={date_created_formatted}
-        date_edited={date_edited_formatted}
-        edit={currentComment.edit}
-        comment_body={currentComment.body}
-        session_login={document.querySelector("#login").innerText}
-        getComments={getComments}
-      />
-    );
-
-    allEditComments.push(
-      <EditComment
-        key={currentComment.comment_id}
-        hike_id={currentComment.hike_id}
-        comment_id={currentComment.comment_id}
-        full_name={currentComment.user.full_name}
-        user_id={currentComment.user_id}
-        date_created={date_created_formatted}
-        date_edited={date_edited_formatted}
-        edit={currentComment.edit}
-        comment_body={currentComment.body}
-        getComments={getComments}
-      />
-    );
-  }
-
   return (
     <React.Fragment>
-      <AddComment getComments={getComments} />
-      {allEditComments}
       <div
-        className="offcanvas offcanvas-end"
-        style={{ width: "650px" }}
-        data-bs-keyboard="true"
-        data-bs-scroll="true"
-        data-bs-backdrop="true"
+        className="modal fade"
+        id={`modal-delete-inventory-${props.inventoryId}`}
         tabIndex="-1"
-        id="Comments"
-        aria-labelledby="CommentsLabel"
+        aria-labelledby={`modal-delete-inventory-${props.inventoryId}-label`}
+        aria-hidden="true"
       >
-        <div className="offcanvas-header">
-          <h3 className="offcanvas-title" id="CommentsLabel">
-            Your Comments For All Hikes
-          </h3>
-          {session_login === "True" ? (
-            <a
-              className="btn btn-sm btn-outline-dark fw-300"
-              href=""
-              data-bs-toggle="modal"
-              data-bs-target="#modal-add-comment"
-            >
-              <i
-                data-bs-toggle="tooltip"
-                data-bs-placement="right"
-                title="add a comment for any hike"
-                className="bi bi-chat-text"
-              ></i>{" "}
-              add a comment
-            </a>
-          ) : null}
-        </div>
-
-        <div className="offcanvas-body">
-          {session_login !== "True" ? (
-            <div className="fw-300">Please log in to view your comments.</div>
-          ) : (
-            <div>{allComments}</div>
-          )}
-
-          <div
-            className="offcanvas-footer"
-            style={{
-              position: "fixed",
-              right: "613px",
-              bottom: "10px",
-              zIndex: "100",
-            }}
-          >
-            <button
-              type="button"
-              className="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5
+                className="modal-title"
+                id={`modal-delete-inventory-${props.inventoryId}-label`}
+              >
+                Delete Inventory Row
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label htmlFor="comment">Deletion Comments</label>
+                <textarea
+                  className="form-control"
+                  name="body"
+                  rows="2"
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
+                ></textarea>
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-sm btn-outline-dark btn-block"
+                  type="submit"
+                  data-bs-dismiss="modal"
+                  onClick={deleteExistingInventory}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary btn-block"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </React.Fragment>
-  );
-};
-
-// Bookmarks Lists Container Component
-const AllHikesBookmarksListContainer = () => {
-  const session_login = document.querySelector("#login").innerText;
-
-  const AddMultHikesToExistingListRef = React.useRef();
-  const BookmarksListRef = React.useRef();
-
-  // Set States
-  const [bookmarksLists, setBookmarksLists] = React.useState([]);
-
-  if (session_login === "True") {
-    React.useEffect(() => {
-      getBookmarksLists();
-    }, []);
-  }
-
-  const getBookmarksLists = () => {
-    fetch("/user_bookmarks_lists.json")
-      .then((response) => response.json())
-      .then((data) => {
-        setBookmarksLists(data.bookmarksLists);
-      });
-  };
-
-  const parentSetHikesOptionState = () => {
-    AddMultHikesToExistingListRef.current.setHikesOptionsState();
-  };
-
-  const allBookmarksLists = [];
-  const allRenameBookmarksLists = [];
-  const allAddMultHikesToExistingList = [];
-
-  const timestamp = Date.now();
-
-  for (const currentBookmarksList of bookmarksLists) {
-    allBookmarksLists.push(
-      <BookmarksList
-        key={currentBookmarksList.bookmarks_list_id}
-        bookmarks_list_name={currentBookmarksList.bookmarks_list_name}
-        bookmarks_list_id={currentBookmarksList.bookmarks_list_id}
-        hikes={currentBookmarksList.hikes}
-        getBookmarksLists={getBookmarksLists}
-        parentSetHikesOptionState={parentSetHikesOptionState}
-        ref={BookmarksListRef}
-      />
-    );
-
-    allAddMultHikesToExistingList.push(
-      <AddMultHikesToExistingList
-        key={`${timestamp}-${currentBookmarksList.bookmarks_list_id}`}
-        bookmarks_list_name={currentBookmarksList.bookmarks_list_name}
-        bookmarks_list_id={currentBookmarksList.bookmarks_list_id}
-        hikes={currentBookmarksList.hikes}
-        getBookmarksLists={getBookmarksLists}
-        ref={AddMultHikesToExistingListRef}
-      />
-    );
-
-    allRenameBookmarksLists.push(
-      <RenameBookmarksList
-        key={currentBookmarksList.bookmarks_list_id}
-        bookmarks_list_name={currentBookmarksList.bookmarks_list_name}
-        bookmarks_list_id={currentBookmarksList.bookmarks_list_id}
-        getBookmarksLists={getBookmarksLists}
-      />
-    );
-  }
-
-  return (
-    <React.Fragment>
-      <CreateBookmarksList getBookmarksLists={getBookmarksLists} />
-      {allRenameBookmarksLists}
-      {allAddMultHikesToExistingList}
-      <div
-        className="offcanvas offcanvas-end"
-        data-bs-keyboard="true"
-        data-bs-scroll="true"
-        data-bs-backdrop="true"
-        tabIndex="-1"
-        id="Bookmarks"
-        aria-labelledby="BookmarksLabel"
-        style={{ width: "790px" }}
-      >
-        <div className="offcanvas-header">
-          <h3 className="offcanvas-title" id="BookmarksLabel">
-            All Bookmarks
-          </h3>
-          {session_login === "True" ? (
-            <a
-              className="btn btn-sm btn-outline-dark fw-300"
-              href=""
-              data-bs-toggle="modal"
-              data-bs-target="#modal-create-bookmarks-list"
-            >
-              <i
-                data-bs-toggle="tooltip"
-                data-bs-placement="right"
-                title="create a bookmarks list"
-                className="bi bi-bookmark-star"
-              ></i>{" "}
-              create a list
-            </a>
-          ) : null}
-        </div>
-
-        <div className="offcanvas-body">
-          {session_login !== "True" ? (
-            <div className="fw-300">Please log in to add a bookmark.</div>
-          ) : (
-            <div>{allBookmarksLists}</div>
-          )}
-          <div
-            className="offcanvas-footer"
-            style={{
-              position: "fixed",
-              right: "757px",
-              bottom: "10px",
-              zIndex: "100",
-            }}
-          >
-            <button
-              type="button"
-              className="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </React.Fragment>
-  );
-};
-
-const HikeTableRow = (props) => {
-  return (
-    <tr>
-      <td>
-        {props.sortParam === "name-asc" || props.sortParam === "name-desc" ? (
-          <span
-            className="td-hike-name d-inline-block text-truncate fw-400"
-            style={{
-              minWidth: 0,
-              maxWidth: "400px",
-            }}
-          >
-            <a className="link-dark" href={`/hikes/${props.hike.hike_id}`}>
-              <small>{props.hike.hike_name}</small>
-            </a>
-          </span>
-        ) : (
-          <span
-            className="td-hike-name d-inline-block text-truncate fw-300"
-            style={{ minWidth: 0, maxWidth: "400px" }}
-          >
-            <a className="link-dark" href={`/hikes/${props.hike.hike_id}`}>
-              <small>{props.hike.hike_name}</small>
-            </a>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "difficulty-asc" ||
-        props.sortParam === "difficulty-desc" ? (
-          <span className="td-difficulty fw-400">
-            <small>{props.hike.difficulty}</small>
-          </span>
-        ) : (
-          <span className="td-difficulty fw-300">
-            <small>{props.hike.difficulty}</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "length-asc" ||
-        props.sortParam === "length-desc" ? (
-          <span className="td-miles fw-400">
-            <small>{props.hike.miles} miles</small>
-          </span>
-        ) : (
-          <span className="td-miles fw-300">
-            <small>{props.hike.miles} miles</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "state-asc" || props.sortParam === "state-desc" ? (
-          <span className="td-state fw-400">
-            <small>{props.hike.state}</small>
-          </span>
-        ) : (
-          <span className="td-state fw-300">
-            <small>{props.hike.state}</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "area-asc" || props.sortParam === "area-desc" ? (
-          <span className="td-area fw-400">
-            <small>{props.hike.area}</small>
-          </span>
-        ) : (
-          <span className="td-area fw-300">
-            <small>{props.hike.area}</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "city-asc" || props.sortParam === "city-desc" ? (
-          <span className="td-city fw-400">
-            <small>{props.hike.city}</small>
-          </span>
-        ) : (
-          <span className="td-city fw-300">
-            <small>{props.hike.city}</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "leashRule-asc" ||
-        props.sortParam === "leashRule-desc" ? (
-          <span className="td-leash-rule fw-400">
-            <small>{props.hike.leash_rule}</small>
-          </span>
-        ) : (
-          <span className="td-leash-rule fw-300">
-            <small>{props.hike.leash_rule}</small>
-          </span>
-        )}
-      </td>
-      <td>
-        {props.sortParam === "parking-asc" ||
-        props.sortParam === "parking-desc" ? (
-          <span
-            className="td-parking d-inline-block text-truncate fw-400"
-            style={{ maxWidth: "130px" }}
-          >
-            <small>{props.hike.parking}</small>
-          </span>
-        ) : (
-          <span
-            className="td-parking d-inline-block text-truncate fw-300"
-            style={{ maxWidth: "130px" }}
-          >
-            <small>{props.hike.parking}</small>
-          </span>
-        )}
-      </td>
-    </tr>
   );
 };
 
 const InventoryTableRow = (props) => {
+  // Process deletion
+  const deleteInventory = () => {
+    fetch(`/api/delete_inventory/id:${props.inventoryId}`, {
+      method: "POST",
+    }).then((response) => {
+      response.json().then((jsonResponse) => {
+        // console.log(jsonResponse);
+        props.getInventory();
+      });
+    });
+  };
   return (
     <tr>
       <td>
         <span>
-          <small>{props.hike.parking}</small>
+          <small>{props.inventoryId}</small>
         </span>
       </td>
       <td>
         <span>
-          <small>{props.hike.parking}</small>
+          <small>{props.warehouseId}</small>
         </span>
       </td>
+      <td>
+        <span>
+          <small>{props.productName}</small>
+        </span>
+      </td>
+      <td>
+        <span>
+          <small>{props.sku}</small>
+        </span>
+      </td>
+      <td>
+        <span>
+          <small>{props.description}</small>
+        </span>
+      </td>
+      <td>
+        <span>
+          <small>{props.quantity}</small>
+        </span>
+      </td>
+      {props.deleted === false ? (
+        <React.Fragment>
+          <td>
+            <span>
+              <a
+                href=""
+                className="btn btn-sm btn-outline-dark edit-btn"
+                data-bs-toggle="modal"
+                data-bs-target={`#modal-update-inventory-${props.inventoryId}`}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="update inventory"
+                    className="bi bi-pencil"
+                  ></i>
+                </small>
+              </a>
+            </span>
+          </td>
+          <td>
+            <span>
+              <a
+                href=""
+                className="btn btn-sm btn-outline-dark delete-btn"
+                data-bs-toggle="modal"
+                data-bs-target={`#modal-delete-inventory-${props.inventoryId}`}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="delete inventory"
+                    className="bi bi-x"
+                  ></i>
+                </small>
+              </a>
+            </span>
+          </td>
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          <td>
+            <span>
+              <small>{props.comments}</small>
+            </span>
+          </td>
+          <td>
+            <span>
+              <a
+                href=""
+                className="btn btn-sm btn-outline-dark delete-btn"
+                // onClick={}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="restore inventory"
+                    className="bi bi-plus"
+                  ></i>
+                </small>
+              </a>
+            </span>
+          </td>
+        </React.Fragment>
+      )}
     </tr>
   );
 };
 
-const ShipmentsTable = (props) => {
-  const [shipments, setShipments] = React.useState([]);
+const InventoryContainer = () => {
+  const [view, setView] = React.useState("all");
+  const [inventories, setInventories] = React.useState([]);
+  const [warehouseId, setWarehouseId] = React.useState("");
+  const [productName, setProductName] = React.useState("");
+  const [sku, setSku] = React.useState("");
+  const [quantity, setQuantity] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
-  if (session_login === "True") {
-    React.useEffect(() => {
-      getComments();
-    }, []);
-  }
+  React.useEffect(() => {
+    getInventory();
+  }, []);
 
-  const getComments = () => {
-    fetch(`/user_comments.json`)
+  const getInventory = () => {
+    fetch("/api/inventory")
       .then((response) => response.json())
       .then((data) => {
-        setComments(data.comments);
+        console.log(data);
+        setInventories(data.inventory);
+        setView("all");
       });
   };
 
-  const allComments = [];
-  const allEditComments = [];
+  const getDeletedInventory = () => {
+    fetch("/api/deleted_inventory")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setInventories(data.inventory);
+        setView("deleted");
+      });
+  };
 
-  for (const currentComment of comments) {
-    const date_edited = new Date(currentComment.date_edited);
-    const date_edited_formatted = `${date_edited.toLocaleDateString()} ${date_edited.toLocaleTimeString()}`;
-    const date_created = new Date(currentComment.date_created);
-    const date_created_formatted = `${date_created.toLocaleDateString()} ${date_created.toLocaleTimeString()}`;
+  const addInventoryRow = () => {
+    fetch("/api/create_inventory", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        warehouseId,
+        productName,
+        sku,
+        quantity,
+        description,
+      }),
+    })
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        getInventory();
+      });
+  };
 
-    allComments.push(
-      <Comment
-        key={currentComment.comment_id}
-        hike_id={currentComment.hike_id}
-        hike_name={currentComment.hike.hike_name}
-        comment_id={currentComment.comment_id}
-        full_name={currentComment.user.full_name}
-        user_id={currentComment.user_id}
-        date_created={date_created_formatted}
-        date_edited={date_edited_formatted}
-        edit={currentComment.edit}
-        comment_body={currentComment.body}
-        session_login={document.querySelector("#login").innerText}
-        getComments={getComments}
+  const allInventoryRows = [];
+  const allUpdateInventoryRow = [];
+  const allDeleteInventoryRow = [];
+
+  for (const inventoryRow of inventories) {
+    allInventoryRows.push(
+      <InventoryTableRow
+        key={inventoryRow.inventory_id}
+        inventoryId={inventoryRow.inventory_id}
+        warehouseId={inventoryRow.warehouse_id}
+        productName={inventoryRow.product_name}
+        sku={inventoryRow.sku}
+        description={inventoryRow.description}
+        quantity={inventoryRow.quantity}
+        comments={inventoryRow.comments}
+        deleted={inventoryRow.deleted}
+        getInventory={getInventory}
       />
     );
 
-    allEditComments.push(
-      <EditComment
-        key={currentComment.comment_id}
-        hike_id={currentComment.hike_id}
-        comment_id={currentComment.comment_id}
-        full_name={currentComment.user.full_name}
-        user_id={currentComment.user_id}
-        date_created={date_created_formatted}
-        date_edited={date_edited_formatted}
-        edit={currentComment.edit}
-        comment_body={currentComment.body}
-        getComments={getComments}
+    allUpdateInventoryRow.push(
+      <UpdateInventoryModal
+        key={inventoryRow.inventory_id}
+        inventoryId={inventoryRow.inventory_id}
+        warehouseId={inventoryRow.warehouse_id}
+        productName={inventoryRow.product_name}
+        sku={inventoryRow.sku}
+        description={inventoryRow.description}
+        quantity={inventoryRow.quantity}
+        getInventory={getInventory}
+      />
+    );
+
+    allDeleteInventoryRow.push(
+      <DeleteInventoryModal
+        key={inventoryRow.inventory_id}
+        inventoryId={inventoryRow.inventory_id}
+        warehouseId={inventoryRow.warehouse_id}
+        productName={inventoryRow.product_name}
+        sku={inventoryRow.sku}
+        description={inventoryRow.description}
+        quantity={inventoryRow.quantity}
+        getDeletedInventory={getDeletedInventory}
       />
     );
   }
 
-  return <React.Fragment></React.Fragment>;
+  return (
+    <React.Fragment>
+      {allUpdateInventoryRow}
+      {allDeleteInventoryRow}
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">
+            Logistics - Inventory Tracking
+          </a>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              <li className="nav-item">
+                <a className="nav-link" onClick={getInventory}>
+                  View Inventory
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" onClick={getDeletedInventory}>
+                  View Deleted
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div className="row">
+        <div className="col-3">
+          <div className="card ms-2">
+            <div className="card-header">
+              <h6 className="mt-2">Add Inventory</h6>
+            </div>
+            <div className="card-body">
+              <div className="mb-3">
+                <label htmlFor="petIdInput">Warehouse ID *</label>
+                <select
+                  className="form-select"
+                  aria-label="Select Warehouse ID"
+                  onChange={(event) => setWarehouseId(event.target.value)}
+                >
+                  <option value="" selected></option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((wh) => (
+                    <option value={wh}>{wh}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="productName">Product Name *</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(event) => setProductName(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="sku">SKU *</label>
+                <input
+                  type="text"
+                  value={sku}
+                  onChange={(event) => setSku(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="description">Description</label>
+                <textarea
+                  className="form-control"
+                  name="body"
+                  rows="2"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                ></textarea>
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="quantity">Quantity *</label>
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={quantity}
+                  onChange={(event) => setQuantity(event.target.value)}
+                  className="form-control input-lg"
+                />
+              </div>
+
+              <button
+                className="btn btn-sm btn-outline-dark btn-block"
+                type="submit"
+                onClick={addInventoryRow}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="col-9">
+          <div className="card card-body me-2">
+            <table className="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th role="columnheader">ID</th>
+                  <th role="columnheader">Warehouse</th>
+                  <th role="columnheader">Product Name</th>
+                  <th role="columnheader">SKU</th>
+                  <th role="columnheader">Description</th>
+                  <th role="columnheader">Quantity</th>
+                  {view === "all" ? (
+                    <React.Fragment>
+                      <th role="columnheader">Edit</th>
+                      <th role="columnheader">Delete</th>
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      <th role="columnheader">Comments</th>
+                      <th role="columnheader">Restore</th>
+                    </React.Fragment>
+                  )}
+                </tr>
+              </thead>
+
+              <tbody>{allInventoryRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </React.Fragment>
+  );
 };
 
-const InventoryTable = (props) => {
-  const [inventory, setInventory] = React.useState([]);
-  return <React.Fragment></React.Fragment>;
-};
-
-const InventoryShipmentsContainer = () => {
-  // stuff here
-
-  return <React.Fragment></React.Fragment>;
-};
-
-ReactDOM.render(
-  <InventoryShipmentsContainer />,
-  document.getElementById("root")
-);
+ReactDOM.render(<InventoryContainer />, document.getElementById("root"));

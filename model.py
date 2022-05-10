@@ -1,10 +1,11 @@
 """Models for Shopify Inventory app."""
 
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
-import datetime
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -17,53 +18,64 @@ class Inventory(db.Model):
     inventory_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
     warehouse_id = db.Column(db.Integer, default=1) # Can add a table for storage info and change this to a foreign key
     product_name = db.Column(db.String, nullable=False) # Can add a table for product info and change this to a foreign key
-    description = db.Column(db.String, default=None)
+    sku = db.Column(db.String, unique=True, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.String)
+    created = db.Column(db.DateTime, nullable=False)
+    updated = db.Column(db.DateTime, nullable=False)
     deleted = db.Column(db.Boolean, nullable=False, default=False)
     comments = db.Column(db.Text, default=None)
 
-    shipment_items = db.relationship("ShipmentItem", back_populates="inventory")
-
     def __repr__(self):
-        return f"<Inventory id={self.inventory_id} name={self.product_name} qty={self.quantity}>"
+        return f"<Inventory id={self.inventory_id} name={self.product_name} sku={self.sku} qty={self.quantity}>"
 
+    def to_dict(self):
+        return {
+            "inventory_id": self.inventory_id,
+            "warehouse_id": self.warehouse_id,
+            "product_name": self.product_name,
+            "sku": self.sku,
+            "quantity": self.quantity,
+            "description": self.description,
+            "created": self.created.strftime("%m/%d/%Y, %H:%M:%S"),
+            "updated": self.updated.strftime("%m/%d/%Y, %H:%M:%S"),
+            "deleted": self.deleted,
+            "comments": self.comments,
+        }
 
-class Shipment(db.Model):
-    """A shipment."""
+    @classmethod
+    def create_inventory(cls, warehouse_id, product_name, sku, quantity, description=None,
+        created=datetime.now(), updated=datetime.now(), deleted=False, comments=None):
+        """Create inventory"""
 
-    __tablename__ = "shipments"
+        inventory = cls(warehouse_id=warehouse_id, product_name=product_name, sku=sku, quantity=quantity,
+            description=description, created=created, updated=updated, deleted=deleted, comments=comments)
 
-    shipment_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
-    order_id = db.Column(db.Integer) # Can add a table for order info and change this to a foreign key
-    customer_id = db.Column(db.String, default="") # Can add a table for customer info and change this to a foreign key
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    ship_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    shipping_instructions = db.Column(db.Text, default=None)
-    shipping_address = db.Column(db.String)
+        return inventory
 
-    shipment_items = db.relationship("ShipmentItem", back_populates="shipment")
+    @classmethod
+    def retrieve_inventory(cls):
+        """Retrieve active inventory rows"""
 
-    def __repr__(self):
-        return f"<Shipment id={self.shipment_id} items={self.shipment_items}>"
+        return (db.session.query(cls)
+                          .filter_by(deleted=False)
+                          .order_by(cls.inventory_id.asc())
+                          .all())
 
+    @classmethod
+    def retrieve_deleted_inventory(cls):
+        """Retrieve deleted inventory rows"""
 
-class ShipmentItem(db.Model):
-    """A shipment item."""
+        return (db.session.query(cls)
+                          .filter_by(deleted=True)
+                          .order_by(cls.inventory_id.asc())
+                          .all())
 
-    __tablename__ = "shipment_items"
+    @classmethod
+    def retrieve_inventory_by_inventory_id(cls, inventory_id):
+        """Retrieve inventory row by inventory_id"""
 
-    shipment_item_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
-    shipment_id = db.Column(db.Integer, db.ForeignKey("shipments.shipment_id"), nullable=False)
-    inventory_id = db.Column(db.Integer, db.ForeignKey("inventories.inventory_id"), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-
-    shipment = db.relationship("Shipment",back_populates="shipment_items")
-    inventory = db.relationship("Inventory",back_populates="shipment_items")
-
-    def __repr__(self):
-        return f"<Shipment Item shipment_id={self.shipment_id} inventory_id={self.inventory_id} qty={self.quantity}>"
+        return db.session.query(cls).get(inventory_id)
 
 
 def connect_to_db(flask_app, db_uri="postgresql:///inventory", echo=True):
@@ -80,12 +92,12 @@ def connect_to_db(flask_app, db_uri="postgresql:///inventory", echo=True):
 def example_data():
     """Create example data for the test database."""
     
-    test_inventory = Inventory(product_name="Dark Chocolate", description="", quantity="")
-    test_shipment = Shipment()
-    test_shipment = Shipment()
-    test_shipment = Shipment()
+    inventory1 = Inventory.create_inventory(1, "Milk Chocolate", 50)
+    inventory2 = Inventory.create_inventory(1, "Dark Chocolate", 50)
+    inventory3 = Inventory.create_inventory(1, "White Chocolate", 50)
+    inventory4 = Inventory.create_inventory(1, "Strawberry Chocolate", 75)
     
-    db.session.add_all([test_inventory, test_shipment])
+    db.session.add_all([inventory1, inventory2, inventory3, inventory4])
     db.session.commit()
 
 
