@@ -1,18 +1,15 @@
 """Server for pup journey app."""
 
-from flask import Flask, render_template, jsonify, request, flash, session, redirect
+from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
 
 from model import connect_to_db, db, Inventory
 
-from jinja2 import StrictUndefined
-
 app = Flask(__name__)
 
 app.secret_key = "dev"
-app.jinja_env.undefined = StrictUndefined
 
 
 def validate_fields(warehouse_id=1, product_name="test", sku="1", quantity=1):
@@ -78,7 +75,6 @@ def view_deleted_inventory():
     return jsonify(data=inventory_json)
 
 
-# update inventory
 @app.route("/api/update_inventory/id:<inventory_id>", methods=["POST"])
 def update_inventory(inventory_id):
     """Update and return a JSON response of inventories"""
@@ -95,7 +91,7 @@ def update_inventory(inventory_id):
     inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
 
     if not inventory_row:
-        return jsonify(data="row does not exist", status=400)
+        return jsonify(data="item does not exist", status=400)
 
     inventory_row.warehouse_id = int(warehouse_id)
     inventory_row.product_name = product_name
@@ -110,31 +106,36 @@ def update_inventory(inventory_id):
     return jsonify(data=inventory_json, status=200)
 
 
-# delete inventory
 @app.route("/api/delete_inventory/id:<inventory_id>", methods=["POST"])
 def delete_inventory(inventory_id):
     """Delete an inventory row"""
 
     inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
+
+    if not inventory_row:
+        return jsonify(data="item does not exist", status=400)
+
     inventory_row.comments = request.get_json().get("comments")
     inventory_row.deleted = True
     inventory_row.updated = datetime.now()
-    
     db.session.commit()
     
     inventory_json = inventory_row.to_dict()
 
     return jsonify(data=inventory_json, status=200)
 
-# restore inventory
+
 @app.route("/api/restore_inventory/id:<inventory_id>", methods=["POST"])
 def restore_inventory(inventory_id):
     """Restore a deleted inventory row"""
 
     inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
+
+    if not inventory_row:
+        return jsonify(data="item does not exist", status=400)
+
     inventory_row.deleted = False
     inventory_row.updated = datetime.now()
-
     db.session.commit()
     
     inventory_json = inventory_row.to_dict()
