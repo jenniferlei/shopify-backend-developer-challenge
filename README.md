@@ -27,7 +27,7 @@ I chose to use Flask, a lightweight web framework that is flexible and simple to
 
 Python unittests were added to ensure the API endpoints returned the correct JSON response.
 
-View the app on Replit: [https://shopify-backend-developer-challenge.jenniferlei.repl.co/](https://shopify-backend-developer-challenge.jenniferlei.repl.co/)
+View the app on [Replit](https://shopify-backend-developer-challenge.jenniferlei.repl.co/)
 
 ## Tech Stack
 
@@ -100,6 +100,47 @@ You can now navigate to `localhost:5000/` to start tracking inventory!
 
 HTTP POST `/api/create_inventory`
 
+<details>
+  <summary>Request</summary>
+  <strong>warehouseId</strong>&emsp;&emsp;warehouse id | integer | required
+  <br><strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br><strong>quantity</strong>&emsp;&emsp;&emsp;&emsp;&nbsp;stock quantity | integer | required
+  <br><strong>description</strong>&emsp;&emsp;&emsp;stock description | string
+</details>
+
+<details>
+  <summary>Response 200</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+  <br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+  <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+  <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+  <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required | defaults to current datetime
+  <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required | defaults to current datetime
+  <br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean | required | defaults to false
+  <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text | defaults to none
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>200</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
+
+<details>
+  <summary>Response 400</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>error message</strong> &emsp;short description of the cause of the error | string
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>400</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
+
 #### Example : `http://localhost:5000/api/create_inventory`
 
 ```
@@ -124,6 +165,22 @@ HTTP POST `/api/create_inventory`
 HTTP GET `/api/inventory`
 
 View a list of active inventory items
+
+<details>
+  <summary>Response</summary>
+
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+<br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+<br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+<br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+<br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+<br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
+<br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required
+<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean (false) | required
+<br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
+
+</details>
 
 #### Example : `http://localhost:5000/api/inventory`
 
@@ -161,6 +218,22 @@ HTTP GET `/api/deleted_inventory`
 
 View a list of deleted inventory items
 
+<details>
+  <summary>Response</summary>
+
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+<br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+<br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+<br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+<br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+<br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
+<br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required
+<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean (true) | required
+<br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
+
+</details>
+
 #### Example : `http://localhost:5000/api/deleted_inventory`
 
 ```
@@ -192,9 +265,51 @@ View a list of deleted inventory items
 
 ### Update an inventory item
 
-HTTP POST `/api/update_inventory/id:<inventory_id>`
+HTTP PUT `/api/update_inventory/id:<inventory_id>`
 
 where `<inventory_id>` is the ID of the inventory to update
+
+<details>
+  <summary>Request</summary>
+  <strong>inventory_id</strong>&emsp;&emsp;&ensp;inventory id | integer | required
+  <br><strong>warehouseId</strong>&emsp;&emsp;warehouse id | integer | required
+  <br><strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br><strong>quantity</strong>&emsp;&emsp;&emsp;&emsp;&nbsp;stock quantity | integer | required
+  <br><strong>description</strong>&emsp;&emsp;&emsp;stock description | string
+</details>
+
+<details>
+  <summary>Response 200</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+  <br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+  <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+  <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+  <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
+  <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required | defaults to current datetime
+  <br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean (false) | required
+  <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>200</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
+
+<details>
+  <summary>Response 400</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>error message</strong> &emsp;short description of the cause of the error | string
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>400</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
 
 #### Example : `http://localhost:5000/api/update_inventory/id:<inventory_id>`
 
@@ -217,9 +332,48 @@ where `<inventory_id>` is the ID of the inventory to update
 
 ### Delete an inventory item
 
-HTTP POST `/api/delete_inventory/id:<inventory_id>`
+HTTP PUT `/api/delete_inventory/id:<inventory_id>`
 
 where `<inventory_id>` is the ID of the inventory to delete
+
+<details>
+  <summary>Request</summary>
+    <strong>inventory_id</strong>&emsp;&emsp;&ensp;inventory id | integer | required
+  <br><strong>comments</strong>&emsp;&emsp;&emsp;&nbsp;deletion comments | text
+</details>
+
+<details>
+  <summary>Response 200</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+  <br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+  <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+  <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+  <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
+  <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required | defaults to current datetime
+  <br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean | required | defaults to true
+  <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>200</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
+
+<details>
+  <summary>Response 400</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>error message</strong> &emsp;short description of the cause of the error | string
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>400</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
 
 #### Example : `http://localhost:5000/api/delete_inventory/id:<inventory_id>`
 
@@ -242,9 +396,47 @@ where `<inventory_id>` is the ID of the inventory to delete
 
 ### Undelete/restore an inventory item
 
-HTTP POST `/api/restore_inventory/id:<inventory_id>`
+HTTP PUT `/api/restore_inventory/id:<inventory_id>`
 
 where `<inventory_id>` is the ID of the inventory to restore
+
+<details>
+  <summary>Request</summary>
+  <strong>inventory_id</strong>&emsp;&emsp;warehouse id | integer | required
+</details>
+
+<details>
+  <summary>Response 200</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+  <br>
+&emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
+  <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
+  <br>&emsp;<strong>quantity</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;stock quantity | integer | required
+  <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
+  <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
+  <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required | defaults to current datetime
+  <br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean | required | defaults to false
+  <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>200</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
+
+<details>
+  <summary>Response 400</summary>
+<strong>data</strong>
+<br>
+&emsp;<strong>error message</strong> &emsp;short description of the cause of the error | string
+<br>
+    <strong>status</strong> 
+<br>
+&emsp;<strong>400</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;http status code | integer
+  <br>
+</details>
 
 #### Example : `http://localhost:5000/api/restore_inventory/id:<inventory_id>`
 

@@ -1,41 +1,41 @@
 "use strict";
 
 const PRODUCTS = [
-  { sku: "66BI8PMZ", productName: "Ai Yu Jelly" },
-  { sku: "47LS3QEJ", productName: "Almond Jelly" },
-  { sku: "21TZ4RWZ", productName: "Almond Milk Tea" },
-  { sku: "92JD1VKP", productName: "Aloe" },
-  { sku: "81LN5TUG", productName: "Black Tea" },
-  { sku: "87OQ4BZR", productName: "Boba" },
-  { sku: "01XM0TPK", productName: "Chai Tea" },
-  { sku: "35WC3SHH", productName: "Coconut Jelly" },
-  { sku: "28OC1KQP", productName: "Coffee Jelly" },
-  { sku: "14RJ1RKR", productName: "Egg Pudding" },
-  { sku: "39RS4OCT", productName: "Grass Jelly" },
-  { sku: "65SH4FGF", productName: "Honey Milk Tea" },
-  { sku: "09VI7CCV", productName: "Honeydew Tea" },
-  { sku: "22BC8VMW", productName: "Jasmine Green Tea" },
-  { sku: "84QZ3GVS", productName: "Kiwi Tea" },
-  { sku: "69IO7VUW", productName: "Lychee Tea" },
-  { sku: "51KT1PSU", productName: "Mango Tea" },
-  { sku: "53HA4DWH", productName: "Matcha Tea" },
-  { sku: "52KN0DZE", productName: "Milk Tea" },
-  { sku: "30SU8TVC", productName: "Mint Tea" },
-  { sku: "01UG9SDM", productName: "Mochi" },
-  { sku: "15DB9AGF", productName: "Oolong Tea" },
-  { sku: "17GX0VAR", productName: "Passion Fruit Tea" },
-  { sku: "69DI1HCU", productName: "Peach Tea" },
-  { sku: "45NF0QOB", productName: "Popping Boba" },
-  { sku: "91WM3ILX", productName: "Red Bean" },
-  { sku: "79FW3YBZ", productName: "Roasted Brown Sugar Tea" },
-  { sku: "22KQ4DTO", productName: "Rose Tea" },
-  { sku: "20PV6SQJ", productName: "Taro Tea" },
-  { sku: "56VI2RWA", productName: "Thai Tea" },
+  { sku: "66BI8PMZ", productName: "Ai Yu Jelly", unit: "carton" },
+  { sku: "47LS3QEJ", productName: "Almond Jelly", unit: "carton" },
+  { sku: "21TZ4RWZ", productName: "Almond Milk Tea", unit: "box" },
+  { sku: "92JD1VKP", productName: "Aloe", unit: "carton" },
+  { sku: "81LN5TUG", productName: "Black Tea", unit: "box" },
+  { sku: "87OQ4BZR", productName: "Boba", unit: "carton" },
+  { sku: "01XM0TPK", productName: "Chai Tea", unit: "box" },
+  { sku: "35WC3SHH", productName: "Coconut Jelly", unit: "carton" },
+  { sku: "28OC1KQP", productName: "Coffee Jelly", unit: "carton" },
+  { sku: "14RJ1RKR", productName: "Egg Pudding", unit: "carton" },
+  { sku: "39RS4OCT", productName: "Grass Jelly", unit: "carton" },
+  { sku: "65SH4FGF", productName: "Honey Milk Tea", unit: "box" },
+  { sku: "09VI7CCV", productName: "Honeydew Tea", unit: "box" },
+  { sku: "22BC8VMW", productName: "Jasmine Green Tea", unit: "box" },
+  { sku: "84QZ3GVS", productName: "Kiwi Tea", unit: "box" },
+  { sku: "69IO7VUW", productName: "Lychee Tea", unit: "box" },
+  { sku: "51KT1PSU", productName: "Mango Tea", unit: "box" },
+  { sku: "53HA4DWH", productName: "Matcha Tea", unit: "box" },
+  { sku: "52KN0DZE", productName: "Milk Tea", unit: "box" },
+  { sku: "30SU8TVC", productName: "Mint Tea", unit: "box" },
+  { sku: "01UG9SDM", productName: "Mochi", unit: "carton" },
+  { sku: "15DB9AGF", productName: "Oolong Tea", unit: "box" },
+  { sku: "17GX0VAR", productName: "Passion Fruit Tea", unit: "box" },
+  { sku: "69DI1HCU", productName: "Peach Tea", unit: "box" },
+  { sku: "45NF0QOB", productName: "Popping Boba", unit: "carton" },
+  { sku: "91WM3ILX", productName: "Red Bean", unit: "carton" },
+  { sku: "79FW3YBZ", productName: "Roasted Brown Sugar Tea", unit: "box" },
+  { sku: "22KQ4DTO", productName: "Rose Tea", unit: "box" },
+  { sku: "20PV6SQJ", productName: "Taro Tea", unit: "box" },
+  { sku: "56VI2RWA", productName: "Thai Tea", unit: "box" },
 ];
 
 const getProductName = (sku) => {
   const product = PRODUCTS.find((item) => item.sku === sku);
-  return product.productName;
+  return [product.productName, product.unit];
 };
 
 const validateForm = (warehouseId, sku, qty) => {
@@ -45,7 +45,8 @@ const validateForm = (warehouseId, sku, qty) => {
     qty === "" ||
     Number(qty) < 0 ||
     Number(qty) > 2147483647 ||
-    !Number.isInteger(Number(qty))
+    !Number.isInteger(Number(qty)) ||
+    isNaN(Number(qty))
   ) {
     return false;
   }
@@ -57,7 +58,7 @@ const UpdateInventoryModal = (props) => {
   const [sku, setSku] = React.useState(props.sku);
   const [quantity, setQuantity] = React.useState(props.quantity);
   const [description, setDescription] = React.useState(props.description);
-  const productName = getProductName(props.sku);
+  const [productName, unit] = getProductName(props.sku);
 
   const validateUpdateForm = () => {
     if (validateForm(warehouseId, sku, quantity)) {
@@ -69,7 +70,7 @@ const UpdateInventoryModal = (props) => {
 
   const updateExistingInventory = () => {
     fetch(`/api/update_inventory/id:${props.inventoryId}`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -213,7 +214,7 @@ const DeleteInventoryModal = (props) => {
 
   const deleteExistingInventory = () => {
     fetch(`/api/delete_inventory/id:${props.inventoryId}`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -290,11 +291,11 @@ const DeleteInventoryModal = (props) => {
 };
 
 const InventoryTableRow = (props) => {
-  const productName = getProductName(props.sku);
+  const [productName, unit] = getProductName(props.sku);
 
   const restoreInventory = () => {
     fetch(`/api/restore_inventory/id:${props.inventoryId}`, {
-      method: "POST",
+      method: "PUT",
     })
       .then((response) => response.json())
       .then((jsonResponse) => {
@@ -332,6 +333,11 @@ const InventoryTableRow = (props) => {
       <td>
         <span>
           <small>{props.quantity}</small>
+        </span>
+      </td>
+      <td>
+        <span>
+          <small>{unit}</small>
         </span>
       </td>
       {props.deleted === false ? (
@@ -667,6 +673,7 @@ const InventoryContainer = () => {
                     <th role="columnheader">Product Name</th>
                     <th role="columnheader">Description</th>
                     <th role="columnheader">Quantity</th>
+                    <th role="columnheader">Unit</th>
                     {view === "all" ? (
                       <React.Fragment>
                         <th role="columnheader">Edit</th>

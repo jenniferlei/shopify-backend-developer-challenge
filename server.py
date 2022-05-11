@@ -74,7 +74,7 @@ def view_deleted_inventory():
     return jsonify(data=inventory_json)
 
 
-@app.route("/api/update_inventory/id:<inventory_id>", methods=["POST"])
+@app.route("/api/update_inventory/id:<inventory_id>", methods=["PUT"])
 def update_inventory(inventory_id):
     """Update and return a JSON response of inventories"""
 
@@ -106,7 +106,7 @@ def update_inventory(inventory_id):
     return jsonify(data=inventory_json, status=200)
 
 
-@app.route("/api/delete_inventory/id:<inventory_id>", methods=["POST"])
+@app.route("/api/delete_inventory/id:<inventory_id>", methods=["PUT"])
 def delete_inventory(inventory_id):
     """Delete an inventory row"""
 
@@ -128,7 +128,7 @@ def delete_inventory(inventory_id):
     return jsonify(data=inventory_json, status=200)
 
 
-@app.route("/api/restore_inventory/id:<inventory_id>", methods=["POST"])
+@app.route("/api/restore_inventory/id:<inventory_id>", methods=["PUT"])
 def restore_inventory(inventory_id):
     """Restore a deleted inventory row"""
 

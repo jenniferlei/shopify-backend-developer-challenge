@@ -140,7 +140,7 @@ class FlaskTestsDatabase(TestCase):
         """Test update inventory route."""
 
         # test successful update
-        result = self.client.post("/api/update_inventory/id:1",
+        result = self.client.put("/api/update_inventory/id:1",
                                   json={"warehouseId": "2",\
                                         "sku": "0000005",\
                                         "quantity": "100",\
@@ -150,7 +150,7 @@ class FlaskTestsDatabase(TestCase):
         self.assertNotIn(b'"sku":"0000006"', result.data)
 
         # test update non-existing item
-        result2 = self.client.post("/api/update_inventory/id:100",
+        result2 = self.client.put("/api/update_inventory/id:100",
                                   json={"warehouseId": "2",\
                                         "sku": "0000005",\
                                         "quantity": "0",\
@@ -161,7 +161,7 @@ class FlaskTestsDatabase(TestCase):
         """Test delete inventory route."""
 
         # test successful delete
-        result = self.client.post("/api/delete_inventory/id:1",
+        result = self.client.put("/api/delete_inventory/id:1",
                                   json={"comments": ""})
         self.assertIn(b'"inventory_id":1', result.data)
         self.assertNotIn(b'"inventory_id":2', result.data)
@@ -169,29 +169,29 @@ class FlaskTestsDatabase(TestCase):
         self.assertNotIn(b'"deleted":false', result.data)
 
         # test delete already deleted item
-        result2 = self.client.post("/api/delete_inventory/id:1")
+        result2 = self.client.put("/api/delete_inventory/id:1")
         self.assertIn(b'{"data":"item is already deleted","status":400}', result2.data)
 
         # test delete non-existing item
-        result3 = self.client.post("/api/restore_inventory/id:100")
+        result3 = self.client.put("/api/restore_inventory/id:100")
         self.assertIn(b'{"data":"item does not exist","status":400}', result3.data)
 
     def test_restore_inventory(self):
         """Test restore inventory route."""
 
         # test successful restore
-        result = self.client.post("/api/restore_inventory/id:5")
+        result = self.client.put("/api/restore_inventory/id:5")
         self.assertIn(b'"inventory_id":5', result.data)
         self.assertNotIn(b'"inventory_id":1', result.data)
         self.assertIn(b'"deleted":false', result.data)
         self.assertNotIn(b'"deleted":true', result.data)
 
         # test restore not deleted item
-        result2 = self.client.post("/api/restore_inventory/id:1")
+        result2 = self.client.put("/api/restore_inventory/id:1")
         self.assertIn(b'{"data":"item is already active","status":400}', result2.data)
 
         # test restore non-existing item
-        result3 = self.client.post("/api/restore_inventory/id:100")
+        result3 = self.client.put("/api/restore_inventory/id:100")
         self.assertIn(b'{"data":"item does not exist","status":400}', result3.data)
 
 

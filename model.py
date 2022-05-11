@@ -12,7 +12,7 @@ class Inventory(db.Model):
     __tablename__ = "inventories"
 
     inventory_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
-    warehouse_id = db.Column(db.Integer, default=1) # Can add a table for warehouse storage info and change this to a foreign key
+    warehouse_id = db.Column(db.Integer, nullable=False) # Can add a table for warehouse storage info and change this to a foreign key
     sku = db.Column(db.String(8), nullable=False) # Can add a table for product info and change this to a foreign key
     quantity = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String)
