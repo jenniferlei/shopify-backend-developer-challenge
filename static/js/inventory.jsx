@@ -38,12 +38,34 @@ const getProductName = (sku) => {
   return product.productName;
 };
 
+const validateForm = (warehouseId, sku, qty) => {
+  if (
+    warehouseId === "" ||
+    sku === "" ||
+    qty === "" ||
+    Number(qty) < 0 ||
+    Number(qty) > 2147483647 ||
+    !Number.isInteger(Number(qty))
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const UpdateInventoryModal = (props) => {
   const [warehouseId, setWarehouseId] = React.useState(props.warehouseId);
   const [sku, setSku] = React.useState(props.sku);
   const [quantity, setQuantity] = React.useState(props.quantity);
   const [description, setDescription] = React.useState(props.description);
   const productName = getProductName(props.sku);
+
+  const validateUpdateForm = () => {
+    if (validateForm(warehouseId, sku, quantity)) {
+      updateExistingInventory();
+    } else {
+      alert("Please enter valid input");
+    }
+  };
 
   const updateExistingInventory = () => {
     fetch(`/api/update_inventory/id:${props.inventoryId}`, {
@@ -93,7 +115,9 @@ const UpdateInventoryModal = (props) => {
             </div>
             <div className="modal-body">
               <div className="mb-3">
-                <label htmlFor="warehouseId">Warehouse ID *</label>
+                <label htmlFor="warehouseId">
+                  Warehouse ID <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-select"
                   aria-label="Select Warehouse ID"
@@ -110,7 +134,9 @@ const UpdateInventoryModal = (props) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="sku">SKU *</label>
+                <label htmlFor="sku">
+                  SKU <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-select"
                   aria-label="Select SKU"
@@ -140,7 +166,13 @@ const UpdateInventoryModal = (props) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="totalTimeInput">Quantity *</label>
+                <label htmlFor="totalTimeInput">
+                  Quantity <span style={{ color: "red" }}>*</span>
+                </label>
+                <br></br>
+                <small className="text-muted">
+                  Please enter a qty between 0 and 2147483647
+                </small>
                 <input
                   type="number"
                   step="1"
@@ -156,7 +188,7 @@ const UpdateInventoryModal = (props) => {
                   className="btn btn-sm btn-outline-dark btn-block"
                   type="submit"
                   data-bs-dismiss="modal"
-                  onClick={updateExistingInventory}
+                  onClick={validateUpdateForm}
                 >
                   Update
                 </button>
@@ -405,6 +437,14 @@ const InventoryContainer = () => {
       });
   };
 
+  const validateAddForm = () => {
+    if (validateForm(warehouseId, sku, quantity)) {
+      addInventoryRow();
+    } else {
+      alert("Please enter valid input");
+    }
+  };
+
   const addInventoryRow = () => {
     fetch("/api/create_inventory", {
       method: "POST",
@@ -515,7 +555,9 @@ const InventoryContainer = () => {
             </div>
             <div className="card-body">
               <div className="mb-3">
-                <label htmlFor="warehouseId">Warehouse ID *</label>
+                <label htmlFor="warehouseId">
+                  Warehouse ID <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-select"
                   aria-label="Select Warehouse ID"
@@ -529,7 +571,9 @@ const InventoryContainer = () => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="sku">SKU *</label>
+                <label htmlFor="sku">
+                  SKU <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-select"
                   aria-label="Select SKU"
@@ -557,7 +601,13 @@ const InventoryContainer = () => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="quantity">Quantity *</label>
+                <label htmlFor="quantity">
+                  Quantity <span style={{ color: "red" }}>*</span>
+                </label>
+                <br></br>
+                <small className="text-muted">
+                  Please enter a qty between 0 and 2147483647
+                </small>
                 <input
                   type="number"
                   step="1"
@@ -571,7 +621,7 @@ const InventoryContainer = () => {
               <button
                 className="btn btn-sm btn-outline-dark btn-block"
                 type="submit"
-                onClick={addInventoryRow}
+                onClick={validateAddForm}
               >
                 Add
               </button>
