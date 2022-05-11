@@ -1,4 +1,4 @@
-"""Server for pup journey app."""
+"""Server for Inventory app."""
 
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -12,16 +12,17 @@ app = Flask(__name__)
 app.secret_key = "dev"
 
 
-def validate_fields(warehouse_id=1, product_name="test", sku="1", quantity=1):
+def validate_fields(warehouse_id=1, sku="1", quantity=1):
     """Form fields error handling"""
     if not str(warehouse_id).isnumeric() or \
        not str(sku).isalnum() or \
+       len(str(sku)) > 8 or \
        not str(quantity).isnumeric() or \
        warehouse_id == "" or \
-       product_name == "" or \
        sku == "" or \
        quantity == "" or \
-       int(quantity) < 0:
+       int(quantity) < 0 or \
+       int(quantity) > 2147483647:
         return False
     return True
 
@@ -38,15 +39,14 @@ def create_inventory():
     """Create an inventory row and return a JSON response of inventories"""
 
     warehouse_id = request.get_json().get("warehouseId")
-    product_name = request.get_json().get("productName")
     sku = request.get_json().get("sku")
     quantity = request.get_json().get("quantity")
     description = request.get_json().get("description")
 
-    if not validate_fields(warehouse_id, product_name, sku, quantity):
+    if not validate_fields(warehouse_id, sku, quantity):
         return jsonify(data="invalid input", status=400)
 
-    inventory_row = Inventory.create_inventory(int(warehouse_id), product_name, sku, int(quantity), description)
+    inventory_row = Inventory.create_inventory(int(warehouse_id), sku, int(quantity), description)
     db.session.add(inventory_row)
     db.session.commit()
     
@@ -80,21 +80,22 @@ def update_inventory(inventory_id):
     """Update and return a JSON response of inventories"""
 
     warehouse_id = request.get_json().get("warehouseId")
-    product_name = request.get_json().get("productName")
     sku = request.get_json().get("sku")
     quantity = request.get_json().get("quantity")
     description = request.get_json().get("description")
 
-    if not validate_fields(warehouse_id, product_name, sku, quantity):
+    if not validate_fields(warehouse_id, sku, quantity):
         return jsonify(data="invalid input", status=400)
 
     inventory_row = Inventory.retrieve_inventory_by_inventory_id(inventory_id)
 
     if not inventory_row:
         return jsonify(data="item does not exist", status=400)
+    
+    if inventory_row.deleted:
+        return jsonify(data="cannot update deleted item", status=400)
 
     inventory_row.warehouse_id = int(warehouse_id)
-    inventory_row.product_name = product_name
     inventory_row.sku = sku
     inventory_row.quantity = int(quantity)
     inventory_row.description = description

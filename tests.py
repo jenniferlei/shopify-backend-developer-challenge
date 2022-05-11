@@ -50,18 +50,16 @@ class FlaskTestsDatabase(TestCase):
         # test successful create
         result = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
                                         "sku": "12345",\
                                         "quantity": "10",\
                                         "description": ""})
         self.assertIn(b'"status":200', result.data)
-        self.assertIn(b'"product_name":"TEST"', result.data)
+        self.assertIn(b'"sku":"12345"', result.data)
         self.assertIn(b'"deleted":false', result.data)
 
         # test invalid input: not str(warehouse_id).isnumeric()
         result2 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "A",\
-                                        "productName": "TEST",\
                                         "sku": "12345",\
                                         "quantity": "10",\
                                         "description": ""})
@@ -70,34 +68,30 @@ class FlaskTestsDatabase(TestCase):
         # test invalid input: not str(sku).isalnum()
         result3 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
                                         "sku": "1!324",\
                                         "quantity": "10",\
                                         "description": ""})
         self.assertIn(b'{"data":"invalid input","status":400}', result3.data)
 
-        # test invalid input: not str(quantity).isnumeric()
+        # test invalid input: len(str(sku)) > 8
         result4 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
-                                        "sku": "12324",\
-                                        "quantity": "A",\
+                                        "sku": "123456789",\
+                                        "quantity": "10",\
                                         "description": ""})
         self.assertIn(b'{"data":"invalid input","status":400}', result4.data)
 
-        # test invalid input: warehouseId == ""
+        # test invalid input: not str(quantity).isnumeric()
         result5 = self.client.post("/api/create_inventory",
-                                  json={"warehouseId": "",\
-                                        "productName": "TEST",\
-                                        "sku": "12345",\
-                                        "quantity": "10",\
+                                  json={"warehouseId": "1",\
+                                        "sku": "12324",\
+                                        "quantity": "A",\
                                         "description": ""})
         self.assertIn(b'{"data":"invalid input","status":400}', result5.data)
 
-        # test invalid input: productName == ""
+        # test invalid input: warehouseId == ""
         result6 = self.client.post("/api/create_inventory",
-                                  json={"warehouseId": "1",\
-                                        "productName": "",\
+                                  json={"warehouseId": "",\
                                         "sku": "12345",\
                                         "quantity": "10",\
                                         "description": ""})
@@ -106,7 +100,6 @@ class FlaskTestsDatabase(TestCase):
         # test invalid input: sku == ""
         result7 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
                                         "sku": "",\
                                         "quantity": "10",\
                                         "description": ""})
@@ -115,7 +108,6 @@ class FlaskTestsDatabase(TestCase):
         # test invalid input: quantity == ""
         result8 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
                                         "sku": "12345",\
                                         "quantity": "",\
                                         "description": ""})
@@ -124,7 +116,6 @@ class FlaskTestsDatabase(TestCase):
         # test invalid input: int(quantity) < 0
         result9 = self.client.post("/api/create_inventory",
                                   json={"warehouseId": "1",\
-                                        "productName": "TEST",\
                                         "sku": "12345",\
                                         "quantity": "-1",\
                                         "description": ""})
@@ -151,18 +142,16 @@ class FlaskTestsDatabase(TestCase):
         # test successful update
         result = self.client.post("/api/update_inventory/id:1",
                                   json={"warehouseId": "2",\
-                                        "productName": "Orange Chocolate",\
                                         "sku": "0000005",\
                                         "quantity": "100",\
                                         "description": ""})
         self.assertIn(b'"status":200', result.data)
-        self.assertIn(b'"product_name":"Orange Chocolate"', result.data)
-        self.assertNotIn(b'"product_name":"Milk Chocolate"', result.data)
+        self.assertIn(b'"sku":"0000005"', result.data)
+        self.assertNotIn(b'"sku":"0000006"', result.data)
 
         # test update non-existing item
         result2 = self.client.post("/api/update_inventory/id:100",
                                   json={"warehouseId": "2",\
-                                        "productName": "Orange Chocolate",\
                                         "sku": "0000005",\
                                         "quantity": "0",\
                                         "description": ""})

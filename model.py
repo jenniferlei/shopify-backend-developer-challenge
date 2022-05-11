@@ -1,4 +1,4 @@
-"""Models for Shopify Inventory app."""
+"""Models for Inventory app."""
 
 import os
 from flask import Flask
@@ -17,8 +17,7 @@ class Inventory(db.Model):
 
     inventory_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
     warehouse_id = db.Column(db.Integer, default=1) # Can add a table for warehouse storage info and change this to a foreign key
-    product_name = db.Column(db.String, nullable=False) # Can add a table for product and change this to product_id & foreign key
-    sku = db.Column(db.String, nullable=False)
+    sku = db.Column(db.String(8), nullable=False) # Can add a table for product info and change this to a foreign key
     quantity = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String)
     created = db.Column(db.DateTime, nullable=False)
@@ -27,13 +26,12 @@ class Inventory(db.Model):
     comments = db.Column(db.Text, default=None)
 
     def __repr__(self):
-        return f"<Inventory id={self.inventory_id} name={self.product_name} sku={self.sku} qty={self.quantity}>"
+        return f"<Inventory id={self.inventory_id} sku={self.sku} qty={self.quantity}>"
 
     def to_dict(self):
         return {
             "inventory_id": self.inventory_id,
             "warehouse_id": self.warehouse_id,
-            "product_name": self.product_name,
             "sku": self.sku,
             "quantity": self.quantity,
             "description": self.description,
@@ -44,11 +42,11 @@ class Inventory(db.Model):
         }
 
     @classmethod
-    def create_inventory(cls, warehouse_id, product_name, sku, quantity, description=None,
+    def create_inventory(cls, warehouse_id, sku, quantity, description=None,
         created=datetime.now(), updated=datetime.now(), deleted=False, comments=None):
         """Create inventory"""
 
-        inventory = cls(warehouse_id=warehouse_id, product_name=product_name, sku=sku, quantity=quantity,
+        inventory = cls(warehouse_id=warehouse_id, sku=sku, quantity=quantity,
             description=description, created=created, updated=updated, deleted=deleted, comments=comments)
 
         return inventory
@@ -92,12 +90,12 @@ def connect_to_db(flask_app, db_uri="postgresql:///inventory", echo=True):
 def example_data():
     """Create example data for the test database."""
     
-    inventory1 = Inventory.create_inventory(1, "Milk Chocolate", "0000001", 50)
-    inventory2 = Inventory.create_inventory(1, "Dark Chocolate", "0000002", 50)
-    inventory3 = Inventory.create_inventory(1, "White Chocolate", "0000003", 50)
-    inventory4 = Inventory.create_inventory(1, "Strawberry Chocolate", "0000004", 75)
+    inventory1 = Inventory.create_inventory(1, "53HA4DWH", 50)
+    inventory2 = Inventory.create_inventory(1, "65SH4FGF", 50)
+    inventory3 = Inventory.create_inventory(1, "69DI1HCU", 50)
+    inventory4 = Inventory.create_inventory(1, "84QZ3GVS", 75)
 
-    inventory5 = Inventory.create_inventory(1, "Strawberry Chocolate", "0000004", 10, deleted=True, comments="This batch went bad")
+    inventory5 = Inventory.create_inventory(1, "53HA4DWH", 10, deleted=True, comments="This batch went bad")
 
     db.session.add_all([inventory1, inventory2, inventory3, inventory4, inventory5])
     db.session.commit()

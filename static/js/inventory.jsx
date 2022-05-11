@@ -1,11 +1,49 @@
 "use strict";
 
+const PRODUCTS = [
+  { sku: "66BI8PMZ", productName: "Ai Yu Jelly" },
+  { sku: "47LS3QEJ", productName: "Almond Jelly" },
+  { sku: "21TZ4RWZ", productName: "Almond Milk Tea" },
+  { sku: "92JD1VKP", productName: "Aloe" },
+  { sku: "81LN5TUG", productName: "Black Tea" },
+  { sku: "87OQ4BZR", productName: "Boba" },
+  { sku: "01XM0TPK", productName: "Chai Tea" },
+  { sku: "35WC3SHH", productName: "Coconut Jelly" },
+  { sku: "28OC1KQP", productName: "Coffee Jelly" },
+  { sku: "14RJ1RKR", productName: "Egg Pudding" },
+  { sku: "39RS4OCT", productName: "Grass Jelly" },
+  { sku: "65SH4FGF", productName: "Honey Milk Tea" },
+  { sku: "09VI7CCV", productName: "Honeydew Tea" },
+  { sku: "22BC8VMW", productName: "Jasmine Green Tea" },
+  { sku: "84QZ3GVS", productName: "Kiwi Tea" },
+  { sku: "69IO7VUW", productName: "Lychee Tea" },
+  { sku: "51KT1PSU", productName: "Mango Tea" },
+  { sku: "53HA4DWH", productName: "Matcha Tea" },
+  { sku: "52KN0DZE", productName: "Milk Tea" },
+  { sku: "30SU8TVC", productName: "Mint Tea" },
+  { sku: "01UG9SDM", productName: "Mochi" },
+  { sku: "15DB9AGF", productName: "Oolong Tea" },
+  { sku: "17GX0VAR", productName: "Passion Fruit Tea" },
+  { sku: "69DI1HCU", productName: "Peach Tea" },
+  { sku: "45NF0QOB", productName: "Popping Boba" },
+  { sku: "91WM3ILX", productName: "Red Bean" },
+  { sku: "79FW3YBZ", productName: "Roasted Brown Sugar Tea" },
+  { sku: "22KQ4DTO", productName: "Rose Tea" },
+  { sku: "20PV6SQJ", productName: "Taro Tea" },
+  { sku: "56VI2RWA", productName: "Thai Tea" },
+];
+
+const getProductName = (sku) => {
+  const product = PRODUCTS.find((item) => item.sku === sku);
+  return product.productName;
+};
+
 const UpdateInventoryModal = (props) => {
   const [warehouseId, setWarehouseId] = React.useState(props.warehouseId);
-  const [productName, setProductName] = React.useState(props.productName);
   const [sku, setSku] = React.useState(props.sku);
   const [quantity, setQuantity] = React.useState(props.quantity);
   const [description, setDescription] = React.useState(props.description);
+  const productName = getProductName(props.sku);
 
   const updateExistingInventory = () => {
     fetch(`/api/update_inventory/id:${props.inventoryId}`, {
@@ -16,7 +54,6 @@ const UpdateInventoryModal = (props) => {
       },
       body: JSON.stringify({
         warehouseId,
-        productName,
         sku,
         quantity,
         description,
@@ -74,22 +111,21 @@ const UpdateInventoryModal = (props) => {
 
               <div className="mb-3">
                 <label htmlFor="sku">SKU *</label>
-                <input
-                  type="text"
-                  value={sku}
+                <select
+                  className="form-select"
+                  aria-label="Select SKU"
+                  id="sku"
                   onChange={(event) => setSku(event.target.value)}
-                  className="form-control input-lg"
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="productName">Product Name *</label>
-                <input
-                  type="text"
-                  value={productName}
-                  onChange={(event) => setProductName(event.target.value)}
-                  className="form-control input-lg"
-                />
+                >
+                  <option value={props.sku} selected>
+                    {props.sku} {productName}
+                  </option>
+                  {PRODUCTS.map((x) => (
+                    <option value={x.sku}>
+                      {x.sku} {x.productName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-3">
@@ -222,7 +258,8 @@ const DeleteInventoryModal = (props) => {
 };
 
 const InventoryTableRow = (props) => {
-  // Process restore
+  const productName = getProductName(props.sku);
+
   const restoreInventory = () => {
     fetch(`/api/restore_inventory/id:${props.inventoryId}`, {
       method: "POST",
@@ -252,7 +289,7 @@ const InventoryTableRow = (props) => {
       </td>
       <td>
         <span>
-          <small>{props.productName}</small>
+          <small>{productName}</small>
         </span>
       </td>
       <td>
@@ -340,7 +377,6 @@ const InventoryContainer = () => {
   const [view, setView] = React.useState("all");
   const [inventories, setInventories] = React.useState([]);
   const [warehouseId, setWarehouseId] = React.useState("");
-  const [productName, setProductName] = React.useState("");
   const [sku, setSku] = React.useState("");
   const [quantity, setQuantity] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -378,7 +414,6 @@ const InventoryContainer = () => {
       },
       body: JSON.stringify({
         warehouseId,
-        productName,
         sku,
         quantity,
         description,
@@ -401,7 +436,6 @@ const InventoryContainer = () => {
         key={inventoryRow.inventory_id}
         inventoryId={inventoryRow.inventory_id}
         warehouseId={inventoryRow.warehouse_id}
-        productName={inventoryRow.product_name}
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
@@ -416,7 +450,6 @@ const InventoryContainer = () => {
         key={inventoryRow.inventory_id}
         inventoryId={inventoryRow.inventory_id}
         warehouseId={inventoryRow.warehouse_id}
-        productName={inventoryRow.product_name}
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
@@ -429,7 +462,6 @@ const InventoryContainer = () => {
         key={inventoryRow.inventory_id}
         inventoryId={inventoryRow.inventory_id}
         warehouseId={inventoryRow.warehouse_id}
-        productName={inventoryRow.product_name}
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
@@ -445,7 +477,7 @@ const InventoryContainer = () => {
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
-            Logistics - Inventory Tracking
+            BOBA Logistics - Inventory Tracking
           </a>
           <button
             className="navbar-toggler"
@@ -461,12 +493,12 @@ const InventoryContainer = () => {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link" onClick={getInventory}>
+                <a className="nav-link btn" onClick={getInventory}>
                   View Inventory
                 </a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" onClick={getDeletedInventory}>
+                <a className="nav-link btn" onClick={getDeletedInventory}>
                   View Deleted
                 </a>
               </li>
@@ -498,22 +530,19 @@ const InventoryContainer = () => {
 
               <div className="mb-3">
                 <label htmlFor="sku">SKU *</label>
-                <input
-                  type="text"
-                  value={sku}
+                <select
+                  className="form-select"
+                  aria-label="Select SKU"
+                  id="sku"
                   onChange={(event) => setSku(event.target.value)}
-                  className="form-control input-lg"
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="productName">Product Name *</label>
-                <input
-                  type="text"
-                  value={productName}
-                  onChange={(event) => setProductName(event.target.value)}
-                  className="form-control input-lg"
-                />
+                >
+                  <option value="" selected></option>
+                  {PRODUCTS.map((x) => (
+                    <option value={x.sku}>
+                      {x.sku} {x.productName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-3">
