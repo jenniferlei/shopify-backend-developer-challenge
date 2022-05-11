@@ -547,7 +547,7 @@ const InventoryContainer = () => {
         </div>
       </nav>
 
-      <div className="row">
+      <div className="row" style={{ width: "100vw" }}>
         <div className="col-3">
           <div className="card ms-2">
             <div className="card-header">
@@ -629,32 +629,43 @@ const InventoryContainer = () => {
           </div>
         </div>
         <div className="col-9">
-          <div className="card card-body me-2">
-            <table className="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th role="columnheader">ID</th>
-                  <th role="columnheader">Warehouse</th>
-                  <th role="columnheader">SKU</th>
-                  <th role="columnheader">Product Name</th>
-                  <th role="columnheader">Description</th>
-                  <th role="columnheader">Quantity</th>
-                  {view === "all" ? (
-                    <React.Fragment>
-                      <th role="columnheader">Edit</th>
-                      <th role="columnheader">Delete</th>
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment>
-                      <th role="columnheader">Comments</th>
-                      <th role="columnheader">Restore</th>
-                    </React.Fragment>
-                  )}
-                </tr>
-              </thead>
+          <div className="card">
+            <div className="card-header">
+              <h6 className="mt-2">
+                {view === "all" ? (
+                  <React.Fragment>Active Inventory</React.Fragment>
+                ) : (
+                  <React.Fragment>Deleted Inventory</React.Fragment>
+                )}
+              </h6>
+            </div>
+            <div className="card-body me-2">
+              <table className="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th role="columnheader">ID</th>
+                    <th role="columnheader">Warehouse</th>
+                    <th role="columnheader">SKU</th>
+                    <th role="columnheader">Product Name</th>
+                    <th role="columnheader">Description</th>
+                    <th role="columnheader">Quantity</th>
+                    {view === "all" ? (
+                      <React.Fragment>
+                        <th role="columnheader">Edit</th>
+                        <th role="columnheader">Delete</th>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <th role="columnheader">Comments</th>
+                        <th role="columnheader">Restore</th>
+                      </React.Fragment>
+                    )}
+                  </tr>
+                </thead>
 
-              <tbody>{allInventoryRows}</tbody>
-            </table>
+                <tbody>{allInventoryRows}</tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

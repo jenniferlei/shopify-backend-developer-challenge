@@ -1,7 +1,6 @@
 """Server for Inventory app."""
 
 from flask import Flask, render_template, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
 
@@ -152,5 +151,7 @@ def restore_inventory(inventory_id):
 
 if __name__ == "__main__":
     # DebugToolbarExtension(app)
+    os.system("createdb inventory")
     connect_to_db(app)
+    db.create_all()
     app.run(host="0.0.0.0", debug=True)

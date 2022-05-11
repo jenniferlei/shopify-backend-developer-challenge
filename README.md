@@ -27,7 +27,7 @@ I chose to use Flask, a lightweight web framework that is flexible and simple to
 
 Python unittests were added to ensure the API endpoints returned the correct JSON response.
 
-View the app on Replit: <a href="" target="_blank">TBD</a>
+View the app on Replit: [https://shopify-backend-developer-challenge.jenniferlei.repl.co/](https://shopify-backend-developer-challenge.jenniferlei.repl.co/)
 
 ## Tech Stack
 
@@ -122,6 +122,7 @@ HTTP POST `/api/create_inventory`
 ### View list of inventory items
 
 HTTP GET `/api/inventory`
+
 View a list of active inventory items
 
 #### Example : `http://localhost:5000/api/inventory`
@@ -157,6 +158,7 @@ View a list of active inventory items
 ### View list of deleted inventory items
 
 HTTP GET `/api/deleted_inventory`
+
 View a list of deleted inventory items
 
 #### Example : `http://localhost:5000/api/deleted_inventory`
@@ -191,6 +193,7 @@ View a list of deleted inventory items
 ### Update an inventory item
 
 HTTP POST `/api/update_inventory/id:<inventory_id>`
+
 where `<inventory_id>` is the ID of the inventory to update
 
 #### Example : `http://localhost:5000/api/update_inventory/id:<inventory_id>`
@@ -215,6 +218,7 @@ where `<inventory_id>` is the ID of the inventory to update
 ### Delete an inventory item
 
 HTTP POST `/api/delete_inventory/id:<inventory_id>`
+
 where `<inventory_id>` is the ID of the inventory to delete
 
 #### Example : `http://localhost:5000/api/delete_inventory/id:<inventory_id>`
@@ -239,6 +243,7 @@ where `<inventory_id>` is the ID of the inventory to delete
 ### Undelete/restore an inventory item
 
 HTTP POST `/api/restore_inventory/id:<inventory_id>`
+
 where `<inventory_id>` is the ID of the inventory to restore
 
 #### Example : `http://localhost:5000/api/restore_inventory/id:<inventory_id>`

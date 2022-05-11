@@ -1,7 +1,6 @@
 """Script to seed database."""
 
 import os
-import json
 
 from model import connect_to_db, db, Inventory
 import server

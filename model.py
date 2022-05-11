@@ -1,14 +1,10 @@
 """Models for Inventory app."""
 
-import os
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 
 from datetime import datetime
 
 db = SQLAlchemy()
-
 
 class Inventory(db.Model):
     """A product inventory."""
@@ -102,7 +98,6 @@ def example_data():
 
 
 if __name__ == "__main__":
-
     from server import app
 
     connect_to_db(app)
