@@ -9,7 +9,7 @@ from model import connect_to_db, db, Inventory
 
 app = Flask(__name__)
 
-app.secret_key = "dev"
+app.secret_key = os.environ["APP_SECRET_KEY"]
 
 
 def validate_fields(warehouse_id=1, sku="1", quantity=1):
