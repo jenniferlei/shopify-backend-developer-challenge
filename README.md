@@ -73,7 +73,7 @@ Install the dependencies:
 ```
 
 Note: if you do not run `seed.py`, make sure you create a database named
-points:
+inventory:
 `createdb inventory`.
 
 Create a secrets.sh file to assign a value to APP_SECRET_KEY and run it:
@@ -122,7 +122,7 @@ HTTP POST `/api/create_inventory`
 ### View list of inventory items
 
 HTTP GET `/api/inventory`
-View a list of not-deleted inventory items
+View a list of active inventory items
 
 #### Example : `http://localhost:5000/api/inventory`
 
