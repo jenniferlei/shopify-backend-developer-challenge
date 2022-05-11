@@ -164,11 +164,11 @@ HTTP POST `/api/create_inventory`
 
 HTTP GET `/api/inventory`
 
-View a list of active inventory items
+View a list of all inventory items
 
 <details>
   <summary>Response</summary>
-
+<strong>data</strong>
 &emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
 <br>
 &emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
@@ -177,7 +177,7 @@ View a list of active inventory items
 <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
 <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
 <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required
-<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean (false) | required
+<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean | required
 <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
 
 </details>
@@ -185,42 +185,51 @@ View a list of active inventory items
 #### Example : `http://localhost:5000/api/inventory`
 
 ```
-[
+{
+  "data": [
     {
-        "comments": null,
-        "created": "05/10/2022, 17:44:37",
-        "deleted": false,
-        "description": null,
-        "inventory_id": 1,
-        "quantity": 50,
-        "sku": "53HA4DWH",
-        "updated": "05/10/2022, 17:44:37",
-        "warehouse_id": 1
+      "comments": "expired",
+      "created": "05/10/2022, 22:40:30",
+      "deleted": true,
+      "description": "Small Batch",
+      "inventory_id": 1,
+      "quantity": 5,
+      "sku": "66BI8PMZ",
+      "updated": "05/11/2022, 12:58:57",
+      "warehouse_id": 2
     },
     {
-        "comments": null,
-        "created": "05/10/2022, 17:44:37",
-        "deleted": false,
-        "description": null,
-        "inventory_id": 2,
-        "quantity": 50,
-        "sku": "65SH4FGF",
-        "updated": "05/10/2022, 17:44:37",
-        "warehouse_id": 1
+      "comments": "",
+      "created": "05/11/2022, 10:20:31",
+      "deleted": false,
+      "description": "",
+      "inventory_id": 2,
+      "quantity": 30,
+      "sku": "21TZ4RWZ",
+      "updated": "05/11/2022, 12:53:55",
+      "warehouse_id": 2
     },
     ...
-]
+  ]
+}
 ```
 
-### View list of deleted inventory items
+### View list of inventory items given deletion status
 
-HTTP GET `/api/deleted_inventory`
+HTTP GET `/api/inventory/status:<status>`
 
-View a list of deleted inventory items
+View a list of inventory items given deletion status
+
+where `<status>` is deletion status 0 = false, 1 = true
+
+<details>
+  <summary>Request</summary>
+  <strong>deleted</strong>&emsp;&emsp;deletion status | boolean | required
+</details>
 
 <details>
   <summary>Response</summary>
-
+<strong>data</strong>
 &emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
 <br>
 &emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
@@ -229,38 +238,41 @@ View a list of deleted inventory items
 <br>&emsp;<strong>description</strong>&emsp;&emsp;&nbsp;stock description | string
 <br>&emsp;<strong>created</strong>&emsp;&emsp;&emsp;&emsp;creation datetime | datetime | required
 <br>&emsp;<strong>updated</strong>&emsp;&emsp;&emsp;&ensp;&nbsp;updated datetime | datetime | required
-<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean (true) | required
+<br>&emsp;<strong>deleted</strong>&emsp;&emsp;&emsp;&emsp;deletion status | boolean | required
 <br>&emsp;<strong>comments</strong>&emsp;&emsp;&ensp;&nbsp;deletion comments | text
 
 </details>
 
-#### Example : `http://localhost:5000/api/deleted_inventory`
+#### Example : `http://localhost:5000/api/inventory/status:0`
 
 ```
-[
+{
+  "data": [
     {
-        "comments": "This batch went bad",
-        "created": "05/10/2022, 17:44:37",
-        "deleted": true,
-        "description": null,
-        "inventory_id": 5,
-        "quantity": 10,
-        "sku": "53HA4DWH",
-        "updated": "05/10/2022, 17:44:37",
-        "warehouse_id": 1
+      "comments": "expired",
+      "created": "05/10/2022, 22:40:30",
+      "deleted": false,
+      "description": "Small Batch",
+      "inventory_id": 1,
+      "quantity": 5,
+      "sku": "66BI8PMZ",
+      "updated": "05/11/2022, 12:58:57",
+      "warehouse_id": 2
     },
     {
-        "comments": "expired",
-        "created": "05/10/2022, 18:51:24",
-        "deleted": true,
-        "description": "",
-        "inventory_id": 9,
-        "quantity": 20,
-        "sku": "21TZ4RWZ",
-        "updated": "05/10/2022, 19:02:08",
-        "warehouse_id": 3
-    }
-]
+      "comments": "",
+      "created": "05/11/2022, 10:20:31",
+      "deleted": false,
+      "description": "",
+      "inventory_id": 2,
+      "quantity": 30,
+      "sku": "21TZ4RWZ",
+      "updated": "05/11/2022, 12:53:55",
+      "warehouse_id": 2
+    },
+    ...
+  ]
+}
 ```
 
 ### Update an inventory item
