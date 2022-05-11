@@ -25,7 +25,7 @@ Additional Feature:
 
 I chose to use Flask, a lightweight web framework that is flexible and simple to implement, to create API endpoints. For the database, I used postgreSQL as it is a commonly used relational database and allows for scalability, such as adding product information tables, warehouse storage information tables, etc. I used SQLAlchemy to incorporate Flask and postrgresQL with Python.
 
-Python unittests were added to ensure the API endpoints returned the correct JSON data.
+Python unittests were added to ensure the API endpoints returned the correct JSON response.
 
 View the app on Replit: <a href="" target="_blank">TBD</a>
 
@@ -102,6 +102,8 @@ HTTP POST `/api/create_inventory`
 
 #### Example : `http://localhost:5000/api/create_inventory`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -118,6 +120,7 @@ HTTP POST `/api/create_inventory`
     "status": 200
 }
 ```
+</details>
 
 ### View list of inventory items
 
@@ -126,6 +129,8 @@ View a list of active inventory items
 
 #### Example : `http://localhost:5000/api/inventory`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 [
     {
@@ -153,6 +158,7 @@ View a list of active inventory items
     ...
 ]
 ```
+</details>
 
 ### View list of deleted inventory items
 
@@ -161,6 +167,8 @@ View a list of deleted inventory items
 
 #### Example : `http://localhost:5000/api/deleted_inventory`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 [
     {
@@ -187,6 +195,7 @@ View a list of deleted inventory items
     }
 ]
 ```
+</details>
 
 ### Update an inventory item
 
@@ -195,6 +204,8 @@ where `<inventory_id>` is the ID of the inventory to update
 
 #### Example : `http://localhost:5000/api/update_inventory/id:<inventory_id>`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -211,6 +222,7 @@ where `<inventory_id>` is the ID of the inventory to update
     "status": 200
 }
 ```
+</details>
 
 ### Delete an inventory item
 
@@ -219,6 +231,8 @@ where `<inventory_id>` is the ID of the inventory to delete
 
 #### Example : `http://localhost:5000/api/delete_inventory/id:<inventory_id>`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -235,6 +249,7 @@ where `<inventory_id>` is the ID of the inventory to delete
     "status": 200
 }
 ```
+</details>
 
 ### Undelete/restore an inventory item
 
@@ -243,6 +258,8 @@ where `<inventory_id>` is the ID of the inventory to restore
 
 #### Example : `http://localhost:5000/api/restore_inventory/id:<inventory_id>`
 
+<details>
+  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -259,6 +276,7 @@ where `<inventory_id>` is the ID of the inventory to restore
     "status": 200
 }
 ```
+</details>
 
 ## About the Developer
 
