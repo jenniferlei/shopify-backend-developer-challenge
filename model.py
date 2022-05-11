@@ -49,19 +49,18 @@ class Inventory(db.Model):
 
     @classmethod
     def retrieve_inventory(cls):
-        """Retrieve active inventory rows"""
+        """Retrieve all inventory rows"""
 
         return (db.session.query(cls)
-                          .filter_by(deleted=False)
                           .order_by(cls.inventory_id.asc())
                           .all())
 
     @classmethod
-    def retrieve_deleted_inventory(cls):
-        """Retrieve deleted inventory rows"""
+    def retrieve_inventory_by_status(cls, status):
+        """Retrieve inventory rows by deletion status"""
 
         return (db.session.query(cls)
-                          .filter_by(deleted=True)
+                          .filter_by(deleted=status)
                           .order_by(cls.inventory_id.asc())
                           .all())
 

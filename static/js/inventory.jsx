@@ -85,7 +85,11 @@ const UpdateInventoryModal = (props) => {
       .then((response) => response.json())
       .then((jsonResponse) => {
         console.log(jsonResponse);
-        props.getInventory();
+        if (props.view === "active") {
+          props.getActiveInventory();
+        } else {
+          props.getAllInventory();
+        }
       });
   };
 
@@ -226,7 +230,11 @@ const DeleteInventoryModal = (props) => {
       .then((response) => response.json())
       .then((jsonResponse) => {
         console.log(jsonResponse);
-        props.getInventory();
+        if (props.view === "active") {
+          props.getActiveInventory();
+        } else {
+          props.getAllInventory();
+        }
       });
   };
 
@@ -300,7 +308,11 @@ const InventoryTableRow = (props) => {
       .then((response) => response.json())
       .then((jsonResponse) => {
         console.log(jsonResponse);
-        props.getDeletedInventory();
+        if (props.view === "deleted") {
+          props.getDeletedInventory();
+        } else {
+          props.getAllInventory();
+        }
       });
   };
   return (
@@ -340,7 +352,7 @@ const InventoryTableRow = (props) => {
           <small>{unit}</small>
         </span>
       </td>
-      {props.deleted === false ? (
+      {props.view === "active" ? (
         <React.Fragment>
           <td>
             <span>
@@ -381,8 +393,79 @@ const InventoryTableRow = (props) => {
             </span>
           </td>
         </React.Fragment>
+      ) : props.view === "deleted" ? (
+        <React.Fragment>
+          <td>
+            <span>
+              <small>{props.comments}</small>
+            </span>
+          </td>
+          <td>
+            <span>
+              <button
+                className="btn btn-sm btn-outline-dark delete-btn"
+                onClick={restoreInventory}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="restore inventory"
+                    className="bi bi-plus"
+                  ></i>
+                </small>
+              </button>
+            </span>
+          </td>
+        </React.Fragment>
+      ) : props.deleted === false ? (
+        <React.Fragment>
+          <td>
+            <small>Active</small>
+          </td>
+          <td></td>
+          <td>
+            <span>
+              <a
+                href=""
+                className="btn btn-sm btn-outline-dark edit-btn"
+                data-bs-toggle="modal"
+                data-bs-target={`#modal-update-inventory-${props.inventoryId}`}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="update inventory"
+                    className="bi bi-pencil"
+                  ></i>
+                </small>
+              </a>
+            </span>
+            <span>
+              <a
+                href=""
+                className="btn btn-sm btn-outline-dark delete-btn"
+                data-bs-toggle="modal"
+                data-bs-target={`#modal-delete-inventory-${props.inventoryId}`}
+              >
+                <small>
+                  <i
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
+                    title="delete inventory"
+                    className="bi bi-x"
+                  ></i>
+                </small>
+              </a>
+            </span>
+          </td>
+        </React.Fragment>
       ) : (
         <React.Fragment>
+          <td>
+            <small>Deleted</small>
+          </td>
           <td>
             <span>
               <small>{props.comments}</small>
@@ -412,7 +495,7 @@ const InventoryTableRow = (props) => {
 };
 
 const InventoryContainer = () => {
-  const [view, setView] = React.useState("all");
+  const [view, setView] = React.useState("active");
   const [inventories, setInventories] = React.useState([]);
   const [warehouseId, setWarehouseId] = React.useState("");
   const [sku, setSku] = React.useState("");
@@ -420,26 +503,36 @@ const InventoryContainer = () => {
   const [description, setDescription] = React.useState("");
 
   React.useEffect(() => {
-    getInventory();
+    getActiveInventory();
   }, []);
 
-  const getInventory = () => {
+  const getActiveInventory = () => {
+    fetch("/api/inventory/status:0")
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        setInventories(jsonResponse.data);
+        setView("active");
+      });
+  };
+
+  const getDeletedInventory = () => {
+    fetch("/api/inventory/status:1")
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        setInventories(jsonResponse.data);
+        setView("deleted");
+      });
+  };
+
+  const getAllInventory = () => {
     fetch("/api/inventory")
       .then((response) => response.json())
       .then((jsonResponse) => {
         console.log(jsonResponse);
         setInventories(jsonResponse.data);
         setView("all");
-      });
-  };
-
-  const getDeletedInventory = () => {
-    fetch("/api/deleted_inventory")
-      .then((response) => response.json())
-      .then((jsonResponse) => {
-        console.log(jsonResponse);
-        setInventories(jsonResponse.data);
-        setView("deleted");
       });
   };
 
@@ -468,7 +561,11 @@ const InventoryContainer = () => {
       .then((response) => response.json())
       .then((jsonResponse) => {
         console.log(jsonResponse);
-        getInventory();
+        if (view === "active") {
+          getActiveInventory();
+        } else {
+          getAllInventory();
+        }
       });
   };
 
@@ -487,7 +584,10 @@ const InventoryContainer = () => {
         quantity={inventoryRow.quantity}
         comments={inventoryRow.comments}
         deleted={inventoryRow.deleted}
+        view={view}
+        getActiveInventory={getActiveInventory}
         getDeletedInventory={getDeletedInventory}
+        getAllInventory={getAllInventory}
       />
     );
 
@@ -499,7 +599,9 @@ const InventoryContainer = () => {
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
-        getInventory={getInventory}
+        view={view}
+        getActiveInventory={getActiveInventory}
+        getAllInventory={getAllInventory}
       />
     );
 
@@ -511,7 +613,9 @@ const InventoryContainer = () => {
         sku={inventoryRow.sku}
         description={inventoryRow.description}
         quantity={inventoryRow.quantity}
-        getInventory={getInventory}
+        view={view}
+        getActiveInventory={getActiveInventory}
+        getAllInventory={getAllInventory}
       />
     );
   }
@@ -539,13 +643,18 @@ const InventoryContainer = () => {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link btn" onClick={getInventory}>
-                  View Inventory
+                <a className="nav-link btn" onClick={getActiveInventory}>
+                  View Active
                 </a>
               </li>
               <li className="nav-item">
                 <a className="nav-link btn" onClick={getDeletedInventory}>
                   View Deleted
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link btn" onClick={getAllInventory}>
+                  View All
                 </a>
               </li>
               <li className="nav-item">
@@ -656,10 +765,12 @@ const InventoryContainer = () => {
           <div className="card">
             <div className="card-header">
               <h6 className="mt-2">
-                {view === "all" ? (
+                {view === "active" ? (
                   <React.Fragment>Active Inventory</React.Fragment>
-                ) : (
+                ) : view === "deleted" ? (
                   <React.Fragment>Deleted Inventory</React.Fragment>
+                ) : (
+                  <React.Fragment>All Inventory</React.Fragment>
                 )}
               </h6>
             </div>
@@ -674,15 +785,23 @@ const InventoryContainer = () => {
                     <th role="columnheader">Description</th>
                     <th role="columnheader">Quantity</th>
                     <th role="columnheader">Unit</th>
-                    {view === "all" ? (
+                    {view === "active" ? (
                       <React.Fragment>
                         <th role="columnheader">Edit</th>
                         <th role="columnheader">Delete</th>
                       </React.Fragment>
-                    ) : (
+                    ) : view === "deleted" ? (
                       <React.Fragment>
                         <th role="columnheader">Comments</th>
                         <th role="columnheader">Restore</th>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <th role="columnheader">Status</th>
+                        <th role="columnheader">
+                          Comments <small>(Deleted)</small>
+                        </th>
+                        <th role="columnheader">Actions</th>
                       </React.Fragment>
                     )}
                   </tr>

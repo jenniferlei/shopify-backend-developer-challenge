@@ -64,11 +64,16 @@ def view_inventory():
     return jsonify(data=inventory_json)
 
 
-@app.route("/api/deleted_inventory", methods=["GET"])
-def view_deleted_inventory():
-    """Return a JSON response of deleted inventory rows"""
+@app.route("/api/inventory/status:<status>", methods=["GET"])
+def view_inventory_by_status(status):
+    """Return a JSON response of inventory rows given deletion status"""
+    
+    if status == "0":
+        status = False
+    if status == "1":
+        status = True
 
-    inventory_rows = Inventory.retrieve_deleted_inventory()
+    inventory_rows = Inventory.retrieve_inventory_by_status(status)
     inventory_json = [i.to_dict() for i in inventory_rows]
     
     return jsonify(data=inventory_json)

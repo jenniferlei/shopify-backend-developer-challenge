@@ -121,20 +121,24 @@ class FlaskTestsDatabase(TestCase):
                                         "description": ""})
         self.assertIn(b'{"data":"invalid input","status":400}', result9.data)
 
-    def test_read_inventory(self):
-        """Test read inventory route."""
+    def test_view_inventory(self):
+        """Test view inventory route."""
 
         result = self.client.get("/api/inventory")
         print(result.data)
         self.assertIn(b'"deleted":false', result.data)
+        self.assertIn(b'"deleted":true', result.data)
+
+    def test_view_inventory_by_status(self):
+        """Test view inventory by deletion status route."""
+
+        result = self.client.get("/api/inventory/status:0")
+        self.assertIn(b'"deleted":false', result.data)
         self.assertNotIn(b'"deleted":true', result.data)
 
-    def test_read_deleted_inventory(self):
-        """Test read deleted inventory route."""
-
-        result = self.client.get("/api/deleted_inventory")
-        self.assertIn(b'"deleted":true', result.data)
-        self.assertNotIn(b'"deleted":false', result.data)
+        result2 = self.client.get("/api/inventory/status:1")
+        self.assertIn(b'"deleted":true', result2.data)
+        self.assertNotIn(b'"deleted":false', result2.data)
 
     def test_update_inventory(self):
         """Test update inventory route."""
