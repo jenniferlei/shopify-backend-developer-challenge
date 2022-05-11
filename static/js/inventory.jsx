@@ -542,6 +542,24 @@ const InventoryContainer = () => {
                   View Deleted
                 </a>
               </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link btn"
+                  target="_blank"
+                  href="https://github.com/jenniferlei/shopify-backend-developer-challenge"
+                >
+                  Github
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link btn"
+                  target="_blank"
+                  href="https://shopify-backend-developer-challenge.jenniferlei.repl.co"
+                >
+                  Replit
+                </a>
+              </li>
             </ul>
           </div>
         </div>
