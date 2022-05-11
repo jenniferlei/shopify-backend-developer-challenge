@@ -23,14 +23,11 @@ Additional Feature:
 
 - When deleting, allow deletion comments and undeletion
 
-I chose to use Flask, a lightweight web framework that is flexible and simple to implement, to create API endpoints. I used postgreSQL as it is a commonly used relational database and allows for scalability, such as adding product information tables, warehouse storage information tables, etc. I used SQLAlchemy to incorporate Flask and postrgresQL with Python.
+I chose to use Flask, a lightweight web framework that is flexible and simple to implement, to create API endpoints. For the database, I used postgreSQL as it is a commonly used relational database and allows for scalability, such as adding product information tables, warehouse storage information tables, etc. I used SQLAlchemy to incorporate Flask and postrgresQL with Python.
 
 Python unittests were added to ensure the API endpoints returned the correct JSON data.
 
 View the app on Replit: <a href="" target="_blank">TBD</a>
-
-Replit link: https://replit.com/join/skoroggmmm-bqle
-Github link: https://github.com/bqle/shopify-backend-challenge
 
 ## Tech Stack
 
@@ -51,7 +48,7 @@ To run Shopify Coding Challenge on your local machine, follow the instructions b
 Clone repository:
 
 ```
-$ git clone https://github.com/jenniferlei/Shopify_Developer_Challenge.git
+$ git clone https://github.com/jenniferlei/shopify-backend-developer-challenge.git
 ```
 
 Create and activate a virtual environment inside your project directory:
