@@ -102,8 +102,6 @@ HTTP POST `/api/create_inventory`
 
 #### Example : `http://localhost:5000/api/create_inventory`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -120,7 +118,6 @@ HTTP POST `/api/create_inventory`
     "status": 200
 }
 ```
-</details>
 
 ### View list of inventory items
 
@@ -129,8 +126,6 @@ View a list of active inventory items
 
 #### Example : `http://localhost:5000/api/inventory`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 [
     {
@@ -158,7 +153,6 @@ View a list of active inventory items
     ...
 ]
 ```
-</details>
 
 ### View list of deleted inventory items
 
@@ -167,8 +161,6 @@ View a list of deleted inventory items
 
 #### Example : `http://localhost:5000/api/deleted_inventory`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 [
     {
@@ -195,7 +187,6 @@ View a list of deleted inventory items
     }
 ]
 ```
-</details>
 
 ### Update an inventory item
 
@@ -204,8 +195,6 @@ where `<inventory_id>` is the ID of the inventory to update
 
 #### Example : `http://localhost:5000/api/update_inventory/id:<inventory_id>`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -222,7 +211,6 @@ where `<inventory_id>` is the ID of the inventory to update
     "status": 200
 }
 ```
-</details>
 
 ### Delete an inventory item
 
@@ -231,8 +219,6 @@ where `<inventory_id>` is the ID of the inventory to delete
 
 #### Example : `http://localhost:5000/api/delete_inventory/id:<inventory_id>`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -249,7 +235,6 @@ where `<inventory_id>` is the ID of the inventory to delete
     "status": 200
 }
 ```
-</details>
 
 ### Undelete/restore an inventory item
 
@@ -258,8 +243,6 @@ where `<inventory_id>` is the ID of the inventory to restore
 
 #### Example : `http://localhost:5000/api/restore_inventory/id:<inventory_id>`
 
-<details>
-  <summary>Click to view sample JSON response</summary>
 ```
 {
     "data": {
@@ -276,7 +259,6 @@ where `<inventory_id>` is the ID of the inventory to restore
     "status": 200
 }
 ```
-</details>
 
 ## About the Developer
 
