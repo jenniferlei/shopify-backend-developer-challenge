@@ -169,7 +169,7 @@ View a list of all inventory items
 <details>
   <summary>Response</summary>
 <strong>data</strong>
-&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+<br>&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
 <br>
 &emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
 <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
@@ -230,7 +230,7 @@ where `<status>` is deletion status 0 = false, 1 = true
 <details>
   <summary>Response</summary>
 <strong>data</strong>
-&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
+<br>&emsp;<strong>inventory_id</strong>&emsp;&ensp;&nbsp;inventory id | integer | required
 <br>
 &emsp;<strong>warehouse_id</strong>&emsp;warehouse id | integer | required
 <br>&emsp;<strong>sku</strong>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stock keeping unit | alphanumeric string (max 8 char) | required
