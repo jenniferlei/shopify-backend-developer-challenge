@@ -27,7 +27,7 @@ I chose to use Flask, a lightweight web framework that is flexible and simple to
 
 Python unittests were added to ensure the API endpoints returned the correct JSON response.
 
-View the app on [Replit](https://shopify-backend-developer-challenge.jenniferlei.repl.co/)
+View the app on Replit: [replit](https://replit.com/@jenniferlei/shopify-backend-developer-challenge#main.py) | [site](https://shopify-backend-developer-challenge.jenniferlei.repl.co/)
 
 ## Tech Stack
 
