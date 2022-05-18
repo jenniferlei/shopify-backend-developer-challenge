@@ -31,8 +31,8 @@ View the app on Replit: [replit](https://replit.com/@jenniferlei/shopify-backend
 
 ## Tech Stack
 
-**Backend:** Python3, Flask, SQLAlchemy
-**Frontend:** JavaScript (React), HTML5, CSS3, Bootstrap
+**Backend:** Python3, Flask, SQLAlchemy\
+**Frontend:** JavaScript (React), HTML5, CSS3, Bootstrap\
 **Database:** PostgreSQL
 
 ## Installation
@@ -71,10 +71,6 @@ Install the dependencies:
 ```
 (env) python3 seed.py
 ```
-
-Note: if you do not run `seed.py`, make sure you create a database named
-inventory:
-`createdb inventory`.
 
 Create a secrets.sh file to assign a value to APP_SECRET_KEY and run it:
 
@@ -414,7 +410,7 @@ where `<inventory_id>` is the ID of the inventory to restore
 
 <details>
   <summary>Request</summary>
-  <strong>inventory_id</strong>&emsp;&emsp;warehouse id | integer | required
+  <strong>inventory_id</strong>&emsp;&emsp;inventory id | integer | required
 </details>
 
 <details>
